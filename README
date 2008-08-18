@@ -1,0 +1,3 @@
+xmlsec module for Qore
+
+requires qore 0.7.0 to build
