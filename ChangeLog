@@ -1,0 +1,16 @@
+2008-08-18 16:32  david_nichols
+
+	* AUTHORS, README: updated textx
+
+2008-08-18 15:56  david_nichols
+
+	* COPYING, ltmain.sh: added missing files
+
+2008-08-18 15:49  david_nichols
+
+	* ., AUTHORS, ChangeLog, INSTALL, Makefile.am, NEWS,
+	  QC_XmlSecKey.cc, QC_XmlSecKey.h, QC_XmlSecKeyManager.cc,
+	  QC_XmlSecKeyManager.h, QoreXmlSecKeyDataFormatNode.h,
+	  QoreXmlSecKeyDataIdNode.h, README, configure.ac, qore-xmlsec.h,
+	  reconf.sh, xmlsec.cc: initial import
+

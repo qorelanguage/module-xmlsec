@@ -13,6 +13,7 @@
 #include <xmlsec/xmlenc.h>
 #include <xmlsec/templates.h>
 #include <xmlsec/crypto.h>
+#include <xmlsec/errors.h>
 
 #include "QoreXmlSecKeyDataIdNode.h"
 #include "QoreXmlSecKeyDataFormatNode.h"

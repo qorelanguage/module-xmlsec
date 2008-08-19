@@ -33,6 +33,12 @@ QoreNamespace XmlSec_NS("XmlSec");
 qore_type_t NT_XMLSECKEYDATAID = -1;
 qore_type_t NT_XMLSECKEYDATAFORMAT = -1;
 
+// xmlsec library error callback function
+static void qore_xmlSecErrorsCallback(const char *file, int line, const char *func, const char *errorObject, const char *errorSubject, int reason, const char *msg)
+{
+   //printd(5, "xmlsec error: %s: %s: %s\n", errorObject, errorSubject, msg);
+}
+
 class DSigCtx {
    private:
 
@@ -93,7 +99,9 @@ class QoreXmlDoc {
       xmlDocPtr doc;
 
    public:
-      DLLLOCAL QoreXmlDoc(const char *str) : doc(xmlParseDoc((const xmlChar *)str))
+      // we cast to xmlChar* to work with older versions of libxml2
+      // (newer versions are OK and require "const xmlChar*"
+      DLLLOCAL QoreXmlDoc(const char *str) : doc(xmlParseDoc((xmlChar *)str))
       {
       }
 
@@ -509,6 +517,9 @@ QoreStringNode *xmlsec_module_init()
    // Init xmlsec-crypto library
    if (xmlSecCryptoInit() < 0)
       return new QoreStringNode("xmlsec-crypto initialization failed");
+
+   // set error callback function
+   xmlSecErrorsSetCallback(qore_xmlSecErrorsCallback);
 
    // add builtin functions
    BuiltinFunctionList::add("xmlsec_sign",    f_xmlsec_sign);
