@@ -38,7 +38,10 @@ qore_type_t NT_XMLSECKEYDATAFORMAT = -1;
 // we have to put a lock around the following calls (the same lock!)
 // xmlSecDSigCtxSign(), xmlSecEncCtxBinaryEncrypt(), xmlSecEncCtxXmlEncrypt(), 
 // and xmlSecEncCtxDecrypt() or we get decrypting errors!
+#define NEED_XMLSEC_BIG_LOCK
+#ifdef NEED_XMLSEC_BIG_LOCK
 static QoreThreadLock big_lock;
+#endif
 
 // xmlsec library error callback function
 static void qore_xmlSecErrorsCallback(const char *file, int line, const char *func, const char *errorObject, const char *errorSubject, int reason, const char *msg)
@@ -70,7 +73,9 @@ class DSigCtx {
 
       DLLLOCAL int sign(xmlNodePtr node, ExceptionSink *xsink)
       {
+#ifdef NEED_XMLSEC_BIG_LOCK
 	 AutoLocker al(big_lock);
+#endif
 	 // sign the template
 	 if (xmlSecDSigCtxSign(dsigCtx, node) < 0) {
 	    xsink->raiseException("XMLSEC-DSIGCTX-ERROR", "signature failed");
@@ -174,19 +179,25 @@ class QoreXmlSecEncCtx {
 
       DLLLOCAL int encryptBinary(xmlNodePtr tmpl, const BinaryNode *b)
       {
+#ifdef NEED_XMLSEC_BIG_LOCK
 	 AutoLocker al(big_lock);
+#endif
 	 return (xmlSecEncCtxBinaryEncrypt(encCtx, tmpl, (const unsigned char *)b->getPtr(), b->size()) < 0) ? -1 : 0;
       }
 
       DLLLOCAL int encryptNode(xmlNodePtr tmpl, xmlNodePtr node)
       {
+#ifdef NEED_XMLSEC_BIG_LOCK
 	 AutoLocker al(big_lock);
+#endif
 	 return (xmlSecEncCtxXmlEncrypt(encCtx, tmpl, node) < 0) ? -1 : 0;
       }
 
       DLLLOCAL int decrypt(xmlNodePtr node, BinaryNode *&out, ExceptionSink *xsink)
       {
+#ifdef NEED_XMLSEC_BIG_LOCK
 	 AutoLocker al(big_lock);
+#endif
 	 if (xmlSecEncCtxDecrypt(encCtx, node) < 0 || !encCtx->result) {
 	    xsink->raiseException("XMLSEC-DECRYPT-ERROR", "decryption failed");
 	    return -1;
