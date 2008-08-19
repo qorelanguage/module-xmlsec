@@ -16,9 +16,11 @@ QoreStringNode *xmlsec_module_init();
 void xmlsec_module_ns_init(QoreNamespace *rns, QoreNamespace *qns);
 void xmlsec_module_delete();
 
+#define QORE_XMLSEC_VERSION "0.1"
+
 // qore module symbols
 DLLEXPORT char qore_module_name[] = "xmlsec";
-DLLEXPORT char qore_module_version[] = "0.1";
+DLLEXPORT char qore_module_version[] = QORE_XMLSEC_VERSION;
 DLLEXPORT char qore_module_description[] = "xmlsec module";
 DLLEXPORT char qore_module_author[] = "David Nichols";
 DLLEXPORT char qore_module_url[] = "http://qoretechnologies.com/qore";
@@ -32,6 +34,11 @@ DLLEXPORT qore_license_t qore_module_license = QL_GPL;
 QoreNamespace XmlSec_NS("XmlSec");
 qore_type_t NT_XMLSECKEYDATAID = -1;
 qore_type_t NT_XMLSECKEYDATAFORMAT = -1;
+
+// we have to put a lock around the following calls (the same lock!)
+// xmlSecDSigCtxSign(), xmlSecEncCtxBinaryEncrypt(), xmlSecEncCtxXmlEncrypt(), 
+// and xmlSecEncCtxDecrypt() or we get decrypting errors!
+static QoreThreadLock big_lock;
 
 // xmlsec library error callback function
 static void qore_xmlSecErrorsCallback(const char *file, int line, const char *func, const char *errorObject, const char *errorSubject, int reason, const char *msg)
@@ -63,6 +70,7 @@ class DSigCtx {
 
       DLLLOCAL int sign(xmlNodePtr node, ExceptionSink *xsink)
       {
+	 AutoLocker al(big_lock);
 	 // sign the template
 	 if (xmlSecDSigCtxSign(dsigCtx, node) < 0) {
 	    xsink->raiseException("XMLSEC-DSIGCTX-ERROR", "signature failed");
@@ -100,7 +108,7 @@ class QoreXmlDoc {
 
    public:
       // we cast to xmlChar* to work with older versions of libxml2
-      // (newer versions are OK and require "const xmlChar*"
+      // (newer versions are OK and require "const xmlChar*")
       DLLLOCAL QoreXmlDoc(const char *str) : doc(xmlParseDoc((xmlChar *)str))
       {
       }
@@ -166,16 +174,19 @@ class QoreXmlSecEncCtx {
 
       DLLLOCAL int encryptBinary(xmlNodePtr tmpl, const BinaryNode *b)
       {
+	 AutoLocker al(big_lock);
 	 return (xmlSecEncCtxBinaryEncrypt(encCtx, tmpl, (const unsigned char *)b->getPtr(), b->size()) < 0) ? -1 : 0;
       }
 
       DLLLOCAL int encryptNode(xmlNodePtr tmpl, xmlNodePtr node)
       {
+	 AutoLocker al(big_lock);
 	 return (xmlSecEncCtxXmlEncrypt(encCtx, tmpl, node) < 0) ? -1 : 0;
       }
 
       DLLLOCAL int decrypt(xmlNodePtr node, BinaryNode *&out, ExceptionSink *xsink)
       {
+	 AutoLocker al(big_lock);
 	 if (xmlSecEncCtxDecrypt(encCtx, node) < 0 || !encCtx->result) {
 	    xsink->raiseException("XMLSEC-DECRYPT-ERROR", "decryption failed");
 	    return -1;
@@ -535,6 +546,9 @@ QoreStringNode *xmlsec_module_init()
 
    // setup types and constants
    NT_XMLSECKEYDATAID = get_next_type_id();
+
+   // add constants
+   XmlSec_NS.addConstant("ModuleVersion",               new QoreStringNode(QORE_XMLSEC_VERSION));
 
    XmlSec_NS.addConstant("xmlSecKeyDataAesId",          new QoreXmlSecKeyDataIdNode(xmlSecKeyDataAesId));
    XmlSec_NS.addConstant("xmlSecKeyDataDesId",          new QoreXmlSecKeyDataIdNode(xmlSecKeyDataDesId));
