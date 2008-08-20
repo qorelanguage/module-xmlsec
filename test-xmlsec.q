@@ -88,28 +88,28 @@ class xmlsec_test::xmlsec_test {
 	    my $template = $.get_signature_template("1.0", "hello there, testing");
 
 	    # sign the string with the certificate's private key
-	    $str = xmlsec_sign($template, $.cert_key);
+	    $str = XmlSec::sign($template, $.cert_key);
 	    if ($.verbose)
 		printf("signed message:\n%s\n", $str);
 	    
-	    $.test_value(True, True, "xmlsec_sign()");
+	    $.test_value(True, True, "XmlSec::sign()");
 
 	    # verify the signature
-	    xmlsec_verify($str, $.cert_key);
-	    $.test_value(True, True, "xmlsec_verify()");
+	    XmlSec::verify($str, $.cert_key);
+	    $.test_value(True, True, "XmlSec::verify()");
 	    
 	    my $estr;
 
 	    # encrypt the signed message with a session key using the private key and certificate
-	    $estr = xmlsec_encrypt($str, $.enc_tmpl, $.session_key, $.mgr);
+	    $estr = XmlSec::encrypt($str, $.enc_tmpl, $.session_key, $.mgr);
 	    if ($.verbose)
 		printf("encrypted message:\n%s\n", $estr);
 
-	    $.test_value(True, True, "xmlsec_encrypt()");
+	    $.test_value(True, True, "XmlSec::encrypt()");
 
 	    # decrypt the message and compare to the original
-	    my $dstr = xmlsec_decrypt($estr, $.mgr);
-	    $.test_value($dstr, $str, "xmlsec_decrypt()");
+	    my $dstr = XmlSec::decrypt($estr, $.mgr);
+	    $.test_value($dstr, $str, "XmlSec::decrypt()");
 	
 	    $.ip += 1;
 	}

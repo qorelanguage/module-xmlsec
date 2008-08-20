@@ -38,14 +38,14 @@ class QoreXmlSecKeyManager : public AbstractPrivateData, public QoreThreadLock
       DLLLOCAL QoreXmlSecKeyManager(ExceptionSink *xsink) : keyMgr(xmlSecKeysMngrCreate())
       {
 	 if (!keyMgr) {
-	    xsink->raiseException("XMLSEC-KEYMANAGER-ERROR", "failed to create key manager");
+	    xsink->raiseException("XMLSECKEYMANAGER-ERROR", "failed to create key manager");
 	    return;
 	 }
 
 	 if (xmlSecCryptoAppDefaultKeysMngrInit(keyMgr) < 0) {
 	    xmlSecKeysMngrDestroy(keyMgr);
 	    keyMgr = 0;
-	    xsink->raiseException("XMLSEC-KEYMANAGER-ERROR", "failed to initialize key manager");
+	    xsink->raiseException("XMLSECKEYMANAGER-ERROR", "failed to initialize key manager");
 	 }
       }
 
@@ -62,7 +62,7 @@ class QoreXmlSecKeyManager : public AbstractPrivateData, public QoreThreadLock
 
 	 if (xmlSecCryptoAppDefaultKeysMngrAdoptKey(keyMgr, key)) {
 	    xmlSecKeyDestroy(key);
-	    xsink->raiseException("XMLSEC-KEYMANAGER-ERROR", "failed to adopt key");
+	    xsink->raiseException("XMLSECKEYMANAGER-ERROR", "failed to adopt key");
 	    return -1;
 	 }
 

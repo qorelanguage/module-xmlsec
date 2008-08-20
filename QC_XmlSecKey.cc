@@ -116,6 +116,8 @@ static void XMLSECKEY_copy(QoreObject *self, QoreObject *old, QoreXmlSecKey *key
    self->setPrivate(CID_XMLSECKEY, nk);
 }
 
+// XmlSecKey::setCertificate(string|binary, format)
+// XmlSecKey::setCertificate(SSLCertificate)
 static AbstractQoreNode *XMLSECKEY_setCertificate(QoreObject *self, QoreXmlSecKey *key, const QoreListNode *params, ExceptionSink *xsink)
 {
    const AbstractQoreNode *p = get_param(params, 0);

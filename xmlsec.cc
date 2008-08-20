@@ -35,9 +35,9 @@ QoreNamespace XmlSec_NS("XmlSec");
 qore_type_t NT_XMLSECKEYDATAID = -1;
 qore_type_t NT_XMLSECKEYDATAFORMAT = -1;
 
-// we have to put a lock around the following calls (the same lock!)
+// we have to put a lock around the following calls (the same lock)
 // xmlSecDSigCtxSign(), xmlSecEncCtxBinaryEncrypt(), xmlSecEncCtxXmlEncrypt(), 
-// and xmlSecEncCtxDecrypt() or we get decrypting errors!
+// and xmlSecEncCtxDecrypt() or we get decrypting errors
 #define NEED_XMLSEC_BIG_LOCK
 #ifdef NEED_XMLSEC_BIG_LOCK
 static QoreThreadLock big_lock;
@@ -216,8 +216,8 @@ class QoreXmlSecEncCtx {
 
 };
 
-// xmlsec_encrypt(data_to_encrypt, template_string, XmlSecKey, [XmlSecKeyManager])
-static AbstractQoreNode *f_xmlsec_encrypt(const QoreListNode *args, ExceptionSink *xsink)
+// XmlSec::encrypt(data_to_encrypt, template_string, XmlSecKey, [XmlSecKeyManager])
+static AbstractQoreNode *f_XmlSec_encrypt(const QoreListNode *args, ExceptionSink *xsink)
 {
    const BinaryNode *bin_data = 0;
    const QoreStringNode *str_data = 0;
@@ -231,13 +231,13 @@ static AbstractQoreNode *f_xmlsec_encrypt(const QoreListNode *args, ExceptionSin
 	 str_data = reinterpret_cast<const QoreStringNode *>(data);
    }
    if (!str_data && !bin_data) {
-      xsink->raiseException("XMLSEC-ENCRYPT-ERROR", "missing string or binary data to encrypt as first argument to xmlsec_encrypt()");
+      xsink->raiseException("XMLSEC-ENCRYPT-ERROR", "missing string or binary data to encrypt as first argument to XmlSec::encrypt()");
       return 0;
    }
 
    const QoreStringNode *tmpl = test_string_param(args, 1);
    if (!tmpl) {
-      xsink->raiseException("XMLSEC-ENCRYPT-ERROR", "missing XML template string as second argument to xmlsec_encrypt()");
+      xsink->raiseException("XMLSEC-ENCRYPT-ERROR", "missing XML template string as second argument to XmlSec::encrypt()");
       return 0;
    }
 
@@ -245,7 +245,7 @@ static AbstractQoreNode *f_xmlsec_encrypt(const QoreListNode *args, ExceptionSin
    QoreXmlSecKey *key = obj ? (QoreXmlSecKey *)obj->getReferencedPrivateData(CID_XMLSECKEY, xsink) : 0;
    if (!key) {
       if (!*xsink)
-	 xsink->raiseException("XMLSEC-ENCRYPT-ERROR", "missing XmlSecKey object as third argument to xmlsec_encrypt()");
+	 xsink->raiseException("XMLSEC-ENCRYPT-ERROR", "missing XmlSecKey object as third argument to XmlSec::encrypt()");
       return 0;
    }
    SimpleRefHolder<QoreXmlSecKey> holder(key);
@@ -303,7 +303,7 @@ static AbstractQoreNode *f_xmlsec_encrypt(const QoreListNode *args, ExceptionSin
    
    QoreXmlDoc edoc(edoc_utf8->getBuffer());
    if (!edoc || !edoc.getRootElement()) {
-      xsink->raiseException("XMLSEC-ENCRYPT-ERROR", "failed to parse XML data to encrypt passed as first argument to xmlsec_encrypt()");
+      xsink->raiseException("XMLSEC-ENCRYPT-ERROR", "failed to parse XML data to encrypt passed as first argument to XmlSec::encrypt()");
       return 0;
    }
    
@@ -315,12 +315,12 @@ static AbstractQoreNode *f_xmlsec_encrypt(const QoreListNode *args, ExceptionSin
    return edoc.getString();
 }
 
-// xmlsec_decrypt(xml, XmlSecKey | XmlSecKeyManager)
-static AbstractQoreNode *f_xmlsec_decrypt(const QoreListNode *args, ExceptionSink *xsink)
+// XmlSec::decrypt(xml, XmlSecKey | XmlSecKeyManager)
+static AbstractQoreNode *f_XmlSec_decrypt(const QoreListNode *args, ExceptionSink *xsink)
 {
    const QoreStringNode *xml = test_string_param(args, 0);
    if (!xml) {
-      xsink->raiseException("XMLSEC-DECRYPT-ERROR", "missing XML string to decrypt as first argument to xmlsec_decrypt()");
+      xsink->raiseException("XMLSEC-DECRYPT-ERROR", "missing XML string to decrypt as first argument to XmlSec::decrypt()");
       return 0;
    }
 
@@ -334,7 +334,7 @@ static AbstractQoreNode *f_xmlsec_decrypt(const QoreListNode *args, ExceptionSin
       mgr = obj ? (QoreXmlSecKeyManager *)obj->getReferencedPrivateData(CID_XMLSECKEYMANAGER, xsink) : 0;
       if (!mgr) {
 	 if (!*xsink)
-	    xsink->raiseException("XMLSEC-DECRYPT-ERROR", "missing XmlSecKey or XmlSecKeyManager object as second argument to xmlsec_decrypt()");
+	    xsink->raiseException("XMLSEC-DECRYPT-ERROR", "missing XmlSecKey or XmlSecKeyManager object as second argument to XmlSec::decrypt()");
 	 return 0;
       }
    }
@@ -378,12 +378,12 @@ static AbstractQoreNode *f_xmlsec_decrypt(const QoreListNode *args, ExceptionSin
    return b ? (AbstractQoreNode *)b : (AbstractQoreNode *)doc.getString();
 }
 
-// xmlsec_sign(template_string, XmlSecKey)
-static AbstractQoreNode *f_xmlsec_sign(const QoreListNode *args, ExceptionSink *xsink)
+// XmlSec::sign(template_string, XmlSecKey)
+static AbstractQoreNode *f_XmlSec_sign(const QoreListNode *args, ExceptionSink *xsink)
 {
    const QoreStringNode *templ = test_string_param(args, 0);
    if (!templ) {
-      xsink->raiseException("XMLSEC-SIGN-ERROR", "missing XML template string as first argument to xmlsec_sign()");
+      xsink->raiseException("XMLSEC-SIGN-ERROR", "missing XML template string as first argument to XmlSec::sign()");
       return 0;
    }
 
@@ -391,7 +391,7 @@ static AbstractQoreNode *f_xmlsec_sign(const QoreListNode *args, ExceptionSink *
    QoreXmlSecKey *key = obj ? (QoreXmlSecKey *)obj->getReferencedPrivateData(CID_XMLSECKEY, xsink) : 0;
    if (!key) {
       if (!*xsink)
-	 xsink->raiseException("XMLSEC-SIGN-ERROR", "missing XmlSecKey object as second argument to xmlsec_sign()");
+	 xsink->raiseException("XMLSEC-SIGN-ERROR", "missing XmlSecKey object as second argument to XmlSec::sign()");
       return 0;
    }
    SimpleRefHolder<QoreXmlSecKey> holder(key);
@@ -432,12 +432,12 @@ static AbstractQoreNode *f_xmlsec_sign(const QoreListNode *args, ExceptionSink *
    return doc.getString();
 }
 
-// xmlsec_verify(signed_xml_string, XmlSecKey)
-static AbstractQoreNode *f_xmlsec_verify(const QoreListNode *args, ExceptionSink *xsink)
+// XmlSec::verify(signed_xml_string, XmlSecKey)
+static AbstractQoreNode *f_XmlSec_verify(const QoreListNode *args, ExceptionSink *xsink)
 {
    const QoreStringNode *signed_string = test_string_param(args, 0);
    if (!signed_string) {
-      xsink->raiseException("XMLSEC-VERIFY-ERROR", "missing signed XML string as first argument to xmlsec_verify()");
+      xsink->raiseException("XMLSEC-VERIFY-ERROR", "missing signed XML string as first argument to XmlSec::verify()");
       return 0;
    }
 
@@ -445,7 +445,7 @@ static AbstractQoreNode *f_xmlsec_verify(const QoreListNode *args, ExceptionSink
    QoreXmlSecKey *key = obj ? (QoreXmlSecKey *)obj->getReferencedPrivateData(CID_XMLSECKEY, xsink) : 0;
    if (!key) {
       if (!*xsink)
-	 xsink->raiseException("XMLSEC-VERIFY-ERROR", "missing XmlSecKey object as second argument to xmlsec_verify()");
+	 xsink->raiseException("XMLSEC-VERIFY-ERROR", "missing XmlSecKey object as second argument to XmlSec::verify()");
       return 0;
    }
    SimpleRefHolder<QoreXmlSecKey> holder(key);
@@ -492,6 +492,11 @@ static AbstractQoreNode *f_xmlsec_verify(const QoreListNode *args, ExceptionSink
       xsink->raiseException("XMLSEC-VERIFY-ERROR", "signature verification failed; crypto error");
 
    return 0;
+}
+
+static void XMLSEC_constructor(QoreObject *self, const QoreListNode *params, ExceptionSink *xsink)
+{
+   xsink->raiseException("XMLSEC-CONSTRUCTOR-ERROR", "This class contains only static methods and cannot be instantiated");
 }
 
 QoreStringNode *xmlsec_module_init()
@@ -543,15 +548,19 @@ QoreStringNode *xmlsec_module_init()
    // set error callback function
    xmlSecErrorsSetCallback(qore_xmlSecErrorsCallback);
 
-   // add builtin functions
-   BuiltinFunctionList::add("xmlsec_sign",    f_xmlsec_sign);
-   BuiltinFunctionList::add("xmlsec_verify",  f_xmlsec_verify);
-   BuiltinFunctionList::add("xmlsec_encrypt", f_xmlsec_encrypt);
-   BuiltinFunctionList::add("xmlsec_decrypt", f_xmlsec_decrypt);
-
    // setup XmlSec namespace
 
+   QoreClass *QC_XMLSEC = new QoreClass("XmlSec");
+   QC_XMLSEC->setConstructor(XMLSEC_constructor);
+
+   // add static methods
+   QC_XMLSEC->addStaticMethod("sign",    f_XmlSec_sign);
+   QC_XMLSEC->addStaticMethod("verify",  f_XmlSec_verify);
+   QC_XMLSEC->addStaticMethod("encrypt", f_XmlSec_encrypt);
+   QC_XMLSEC->addStaticMethod("decrypt", f_XmlSec_decrypt);
+
    // add classes
+   XmlSec_NS.addSystemClass(QC_XMLSEC);
    XmlSec_NS.addSystemClass(initXmlSecKeyClass());
    XmlSec_NS.addSystemClass(initXmlSecKeyManagerClass());
 
