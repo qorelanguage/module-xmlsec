@@ -1,3 +1,27 @@
 xmlsec module for Qore
+version 0.0.1 by David Nichols
 
-requires qore 0.7.0 to build
+This module provides the ability for Qore programs to sign, verify, encrypt, and decrypt XML strings according to the xmldsig and xmlenc standards.
+
+Requires qore 0.7.0, libxml2, and xmlsec headers and libraries to build.
+
+Documentation in docs/xmlsec-module-doc.html (using TiddlyWiki)
+
+test/example script: test-xmlsec.q
+
+BUILD AND INSTALL
+-----------------
+
+configure
+make
+sudo make install
+
+The configure script will find out where your qore module directory is found and set this for the install directory.
+
+BUILD FROM SVN
+--------------
+
+reconf.sh
+configure
+make
+sudo make install
