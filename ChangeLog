@@ -1,3 +1,22 @@
+2008-08-20 10:55  david_nichols
+
+	* ChangeLog: updated ChangeLog
+
+2008-08-20 10:54  david_nichols
+
+	* README: updated readme
+
+2008-08-20 10:47  david_nichols
+
+	* docs/xmlsec-module-doc.html: removed some extraneous tiddlers
+
+2008-08-20 10:30  david_nichols
+
+	* QC_XmlSecKey.cc, QC_XmlSecKeyManager.h, docs,
+	  docs/xmlsec-module-doc.html, test-xmlsec.q, xmlsec.cc:
+	  reimplemented functions as static methods of the XmlSec class;
+	  added project documentation
+
 2008-08-19 13:00  david_nichols
 
 	* xmlsec.cc: added a define for the big lock
