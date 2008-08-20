@@ -1,3 +1,22 @@
+2008-08-19 13:00  david_nichols
+
+	* xmlsec.cc: added a define for the big lock
+
+2008-08-19 12:37  david_nichols
+
+	* xmlsec.cc: added big lock around xmlSecDSigCtxSign(),
+	  xmlSecEncCtxBinaryEncrypt(), xmlSecEncCtxXmlEncrypt(), and
+	  xmlSecEncCtxDecrypt() to avoid threading errors
+
+2008-08-19 12:36  david_nichols
+
+	* test-cert.pem, test-key.pem, test-xmlsec.q: test files
+
+2008-08-19 10:53  david_nichols
+
+	* ChangeLog, qore-xmlsec.h, xmlsec.cc: suppressed warning and error
+	  messages from libxmlsec
+
 2008-08-18 16:32  david_nichols
 
 	* AUTHORS, README: updated textx
