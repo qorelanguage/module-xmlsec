@@ -421,15 +421,15 @@ if test -z "$QORE_LDFLAGS"; then
 else
    # test qore version
    AC_MSG_CHECKING([qore library version])
-   qv_major=`grep define.VERSION_MAJOR $QORE_INC_DIR/qore/unix-config.h|cut -f3 -d\  2>/dev/null`
+   qv_major=`grep QORE_VERSION_MAJOR $QORE_INC_DIR/qore/qore-version.h|cut -f3 -d\  2>/dev/null`
    if test -z "$qv_major"; then
       AC_MSG_ERROR([cannot determine; check Qore header files in $QORE_INC_DIR])
    elif test "$qv_major" = "0"; then
-      qv_minor=`grep define.VERSION_MINOR $QORE_INC_DIR/qore/unix-config.h|cut -f3 -d\  2>/dev/null`
+      qv_minor=`grep QORE_VERSION_MINOR $QORE_INC_DIR/qore/qore-version.h|cut -f3 -d\  2>/dev/null`
       if test "$qv_version_minor" = "7"; then
       	 AC_MSG_ERROR([invalid; this module requires version 0.7.0])
       fi
-      qore_version=`grep define.VERSION.\" $QORE_INC_DIR/qore/unix-config.h|cut -f3 -d\ |sed s/\"//g 2>/dev/null`
+      qore_version=`grep QORE_VERSION.\" $QORE_INC_DIR/qore/qore-version.h|cut -f3 -d\ |sed s/\"//g 2>/dev/null`
       AC_MSG_RESULT([${qore_version} OK])
 
       libdir=`qore --module-dir`

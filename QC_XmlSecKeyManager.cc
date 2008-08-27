@@ -68,7 +68,7 @@ static AbstractQoreNode *XMLSECKEYMANAGER_addKey(QoreObject *self, QoreXmlSecKey
 
 QoreClass *initXmlSecKeyManagerClass()
 {
-   tracein("initXmlSecKeyManagerClass()");
+   QORE_TRACE("initXmlSecKeyManagerClass()");
 
    QoreClass *QC_XMLSECKEYMANAGER = new QoreClass("XmlSecKeyManager");
    CID_XMLSECKEYMANAGER = QC_XMLSECKEYMANAGER->getID();

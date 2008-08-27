@@ -213,7 +213,7 @@ static AbstractQoreNode *XMLSECKEY_getSize(QoreObject *self, QoreXmlSecKey *key,
 
 QoreClass *initXmlSecKeyClass()
 {
-   tracein("initXmlSecKeyClass()");
+   QORE_TRACE("initXmlSecKeyClass()");
 
    QoreClass *QC_XMLSECKEY = new QoreClass("XmlSecKey");
    CID_XMLSECKEY = QC_XMLSECKEY->getID();
