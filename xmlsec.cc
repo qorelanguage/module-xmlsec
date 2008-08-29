@@ -4,10 +4,9 @@
   Copyright (C) 2008 David Nichols, all rights reserved
 */
 
-#include <qore/Qore.h>
-#include <qore/QoreSSLCertificate.h>
-
 #include "qore-xmlsec.h"
+
+#include <qore/QoreSSLCertificate.h>
 
 #include "QC_XmlSecKey.h"
 #include "QC_XmlSecKeyManager.h"

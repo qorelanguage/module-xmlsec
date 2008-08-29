@@ -1,4 +1,8 @@
 
+#include "config.h"
+
+#include <qore/Qore.h>
+
 #include <libxml/tree.h>
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
