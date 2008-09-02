@@ -1,9 +1,9 @@
 # Process this file with autoconf to produce a configure script.
 
 # AC_PREREQ(2.59)
-AC_INIT([xmlsec], [0.0.1],
+AC_INIT([qore-xmlsec-module], [0.0.1],
         [David Nichols <nicholsman@gmail.com>],
-        [xmlsec])
+        [qore-xmlsec-module])
 AM_INIT_AUTOMAKE
 AC_CONFIG_HEADER([config.h])
 
@@ -432,7 +432,12 @@ else
       qore_version=`grep QORE_VERSION.\" $QORE_INC_DIR/qore/qore-version.h|cut -f3 -d\ |sed s/\"//g 2>/dev/null`
       AC_MSG_RESULT([${qore_version} OK])
 
-      libdir=`qore --module-dir`
+      if test -z "${prefix}" -o "${prefix}" = "NONE"; then
+         libdir=`qore --module-dir`
+      else
+         module_api=`qore --module-api`
+         libdir="$prefix/lib${LIBSUFFIX}/qore-module-api-$module_api"
+      fi
    fi
 fi
 
@@ -561,7 +566,7 @@ AC_DEFINE_UNQUOTED([TARGET_BITS], $bits, [32 or 64 bit build])
 AM_CONDITIONAL([COND_DEBUG],      [test "$enable_debug" = yes])
 AM_CONDITIONAL([COND_PROFILE],    [test "$enable_profile" = yes])
 
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile])
 AC_OUTPUT
 
 echo "*** BUILTIN FEATURES ***"

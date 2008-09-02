@@ -21,4 +21,4 @@ libtool: $(LIBTOOL_DEPS)
 
 install-exec-hook:
 	mv $(libdir)/xmlsec.$(MODULE_SUFFIX) $(libdir)/xmlsec.qmod
-	rm -f $(libdir)/xmlsec.la $(libdir)/xmlsec.a
+	rm -f $(libdir)/xmlsec.la
