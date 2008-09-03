@@ -174,6 +174,14 @@ else
    bits=32
 fi
 
+# checks for how to build threads
+ACX_PTHREAD
+if test "$acx_pthread_ok" = "no"; then
+   AC_MSG_ERROR(POSIX threads do not seem to be supported on this platform, aborting)
+fi
+CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"
+#LDFLAGS="$LDFLAGS $PTHREAD_LIBS"
+
 AC_ARG_ENABLE([single-compilation-unit],
   [AS_HELP_STRING([--enable-single-compilation-unit],
                   [enable compilation as a single unit (default: on)])],
