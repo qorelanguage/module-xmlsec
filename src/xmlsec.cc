@@ -28,7 +28,7 @@ DLLEXPORT int qore_module_api_minor = QORE_MODULE_API_MINOR;
 DLLEXPORT qore_module_init_t qore_module_init = xmlsec_module_init;
 DLLEXPORT qore_module_ns_init_t qore_module_ns_init = xmlsec_module_ns_init;
 DLLEXPORT qore_module_delete_t qore_module_delete = xmlsec_module_delete;
-DLLEXPORT qore_license_t qore_module_license = QL_GPL;
+DLLEXPORT qore_license_t qore_module_license = QL_LGPL;
 
 QoreNamespace XmlSec_NS("XmlSec");
 qore_type_t NT_XMLSECKEYDATAID = -1;
