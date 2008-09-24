@@ -52,8 +52,7 @@ namespace xmlsec_test {
 }
 
 class xmlsec_test::xmlsec_test {
-    constructor()
-    {
+    constructor() {
 	$.command_line();
 	
  	printf("QORE xmlsec module v%s Test Script (%d thread%s, %d iteration%s per thread)\n", XmlSec::ModuleVersion, 
@@ -77,8 +76,7 @@ class xmlsec_test::xmlsec_test {
 	       $.threads, $.threads == 1 ? "" : "s");
     }
 
-    run_tests()
-    {
+    run_tests() {
 	on_error ++$.errors;
 	on_exit $.counter.dec();
 
@@ -115,8 +113,7 @@ class xmlsec_test::xmlsec_test {
 	}
     }
 
-    static usage()
-    {
+    static usage() {
 	# get script name
 	my $pn = split("/", $ENV."_");
 	$pn = pop $pn; #$l[elements $l - 1];
@@ -133,8 +130,7 @@ class xmlsec_test::xmlsec_test {
 	exit(1);
     }
 
-    private command_line()
-    {
+    private command_line() {
 	my $g = new GetOpt(opts);
 	my $o = $g.parse(\$ARGV);
 	if (exists $o."_ERRORS_") {
@@ -183,8 +179,7 @@ class xmlsec_test::xmlsec_test {
     }
 
     # returns the signature template XML string created from some example parameters
-    get_signature_template($ver, $body)
-    {
+    get_signature_template($ver, $body) {
 	# this template uses several transformations including an XPath specification
 	# to sign the e:Body and e:SenderDetails parts of the tree 
 	my $h = ( "e:TestSignedMessage" :
@@ -208,7 +203,7 @@ class xmlsec_test::xmlsec_test {
 				  ( ( "^attributes^" : ( "Algorithm" : "http://www.w3.org/2000/09/xmldsig#enveloped-signature" ) ),
 				    ( "^attributes^" : ( "Algorithm" : "http://www.w3.org/TR/1999/REC-xpath-19991116" ),
 				      "XPath" :
-				      ( "^attributes^" : ( "xmlns:e" : "http://esoed.egov.bg/2008/05/Envelope/v1" ),
+				      ( "^attributes^" : ( "xmlns:e" : "http://test.local/just_testing" ),
 					"^value^" : "ancestor-or-self::e:Body|ancestor-or-self::e:SenderDetails" ) ),
 				    ( "^attributes^" : ( "Algorithm" : "http://www.w3.org/TR/2001/REC-xml-c14n-20010315" ) ) ) ),
 				"DigestMethod" :
@@ -222,22 +217,19 @@ class xmlsec_test::xmlsec_test {
 	return $.format ? makeFormattedXMLString($h) : makeXMLString($h);
     }
 
-    static get_file($fn)
-    {
+    static get_file($fn) {
 	my $f = new File();
 	$f.open2($fn);
 	return $f.read(-1);
     }
 
-    static get_file_bin($fn)
-    {
+    static get_file_bin($fn) {
 	my $f = new File();
 	$f.open2($fn);
 	return $f.readBinary(-1);
     }
 
-    test_value($v1, $v2, $msg)
-    {
+    test_value($v1, $v2, $msg) {
 	if ($v1 === $v2) {
 	    if ($.verbose)
 		printf("OK: %s test\n", $msg);
