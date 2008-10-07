@@ -1,3 +1,59 @@
+2008-09-24 11:10  david_nichols
+
+	* test-xmlsec.q: cosmetic updates
+
+2008-09-09 09:11  david_nichols
+
+	* docs/xmlsec-module-doc.html: updated docs
+
+2008-09-09 07:09  david_nichols
+
+	* qore-xmlsec-module.spec, src/xmlsec.cc: updated license in spec
+	  file and in source to LGPL
+
+2008-09-08 17:36  david_nichols
+
+	* Makefile.am: missing file
+
+2008-09-03 12:11  david_nichols
+
+	* COPYING: updated license for modules to LGPL (*not* GPL)
+
+2008-09-03 08:46  david_nichols
+
+	* configure.ac, m4, m4/acx_pthread.m4, reconf.sh: added pthread
+	  detection to configure, flags to build
+
+2008-09-03 07:38  david_nichols
+
+	* configure.ac: configure and doc udpates
+
+2008-09-02 15:31  david_nichols
+
+	* Makefile.am, QC_XmlSecKey.cc, QC_XmlSecKey.h,
+	  QC_XmlSecKeyManager.cc, QC_XmlSecKeyManager.h,
+	  QoreXmlSecKeyDataFormatNode.h, QoreXmlSecKeyDataIdNode.h,
+	  configure.ac, qore-xmlsec-module.spec, qore-xmlsec.h, src,
+	  src/Makefile.am, src/QC_XmlSecKey.cc, src/QC_XmlSecKey.h,
+	  src/QC_XmlSecKeyManager.cc, src/QC_XmlSecKeyManager.h,
+	  src/QoreXmlSecKeyDataFormatNode.h, src/QoreXmlSecKeyDataIdNode.h,
+	  src/qore-xmlsec.h, src/xmlsec.cc, xmlsec.cc: updated build, added
+	  spec file
+
+2008-08-29 14:25  david_nichols
+
+	* QC_XmlSecKey.cc, QC_XmlSecKeyManager.cc, qore-xmlsec.h,
+	  xmlsec.cc: updates to include config.h before qore includes
+
+2008-08-27 14:20  david_nichols
+
+	* QC_XmlSecKey.cc, QC_XmlSecKeyManager.cc, configure.ac: updated to
+	  qore 0.7.0 changes
+
+2008-08-20 10:56  david_nichols
+
+	* ChangeLog: updated ChangeLog again
+
 2008-08-20 10:55  david_nichols
 
 	* ChangeLog: updated ChangeLog
