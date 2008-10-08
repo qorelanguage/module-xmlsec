@@ -20,5 +20,5 @@ libtool: $(LIBTOOL_DEPS)
 	$(SHELL) ./config.status --recheck
 
 install-exec-hook:
-	mv $(libdir)/xmlsec.$(MODULE_SUFFIX) $(libdir)/xmlsec.qmod
-	rm -f $(libdir)/xmlsec.la
+	mv $(DESTDIR)$(libdir)/xmlsec.$(MODULE_SUFFIX) $(DESTDIR)$(libdir)/xmlsec.qmod
+	rm -f $(DESTDIR)$(libdir)/xmlsec.la
