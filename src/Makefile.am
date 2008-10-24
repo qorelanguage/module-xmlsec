@@ -4,7 +4,7 @@ XMLSEC_SOURCES = xmlsec.cc QC_XmlSecKey.cc QC_XmlSecKeyManager.cc
 
 lib_LTLIBRARIES = xmlsec.la
 xmlsec_la_SOURCES = $(XMLSEC_SOURCES)
-xmlsec_la_LDFLAGS = -module -avoid-version $(XMLSEC_LDFLAGS) $(LIBXML2_LDFLAGS) $(QORE_LDFLAGS)
+xmlsec_la_LDFLAGS = -module -avoid-version $(XMLSEC_LDFLAGS) $(LIBXML2_LDFLAGS)
 
 AM_CPPFLAGS = $(XMLSEC_CPPFLAGS) $(QORE_CPPFLAGS) $(LIBXML2_CPPFLAGS)
 
