@@ -9,6 +9,7 @@ noinst_HEADERS = src/qore-xmlsec.h \
 	src/QoreXmlSecKeyDataIdNode.h
 
 EXTRA_DIST = COPYING ChangeLog AUTHORS README \
+	RELEASE-NOTES \
 	qore-xmlsec-module.spec docs/xmlsec-module-doc.html
 
 libtool: $(LIBTOOL_DEPS)

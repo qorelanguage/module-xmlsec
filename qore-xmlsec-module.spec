@@ -95,8 +95,8 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
-%{module_dir}/xmlsec.qmod
-%doc COPYING README ChangeLog AUTHORS docs/xmlsec-module-doc.html
+%{module_dir}/xmlsec-api-%{module_api}.qmod
+%doc COPYING README RELEASE-NOTES ChangeLog AUTHORS docs/xmlsec-module-doc.html
 
 %changelog
 * Tue Sep 2 2008 David Nichols <david_nichols@users.sourceforge.net>
