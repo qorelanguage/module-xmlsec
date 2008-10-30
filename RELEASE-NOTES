@@ -1,0 +1,19 @@
+-------------
+Version 0.0.2
+-------------
+
+fixed module linking; version 0.0.1 was actually linked with the qore library,
+which was a big mistake as loading the module with a new version of the
+library would then crash when the module tried to also pull in the old version
+of the qore library
+
+fixed module naming and module directory handling to correspond to changes in
+qore 0.7.1
+
+made qore 0.7.1 the minimum version for compiling the module
+
+-------------
+Version 0.0.1
+-------------
+
+Initial release; see README for more information
