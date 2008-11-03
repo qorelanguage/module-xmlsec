@@ -15,11 +15,9 @@ QoreStringNode *xmlsec_module_init();
 void xmlsec_module_ns_init(QoreNamespace *rns, QoreNamespace *qns);
 void xmlsec_module_delete();
 
-#define QORE_XMLSEC_VERSION "0.1"
-
 // qore module symbols
 DLLEXPORT char qore_module_name[] = "xmlsec";
-DLLEXPORT char qore_module_version[] = QORE_XMLSEC_VERSION;
+DLLEXPORT char qore_module_version[] = PACKAGE_VERSION;
 DLLEXPORT char qore_module_description[] = "xmlsec module";
 DLLEXPORT char qore_module_author[] = "David Nichols";
 DLLEXPORT char qore_module_url[] = "http://qoretechnologies.com/qore";
@@ -567,7 +565,7 @@ QoreStringNode *xmlsec_module_init()
    NT_XMLSECKEYDATAID = get_next_type_id();
 
    // add constants
-   XmlSec_NS.addConstant("ModuleVersion",               new QoreStringNode(QORE_XMLSEC_VERSION));
+   XmlSec_NS.addConstant("ModuleVersion",               new QoreStringNode(PACKAGE_VERSION));
 
    XmlSec_NS.addConstant("xmlSecKeyDataAesId",          new QoreXmlSecKeyDataIdNode(xmlSecKeyDataAesId));
    XmlSec_NS.addConstant("xmlSecKeyDataDesId",          new QoreXmlSecKeyDataIdNode(xmlSecKeyDataDesId));

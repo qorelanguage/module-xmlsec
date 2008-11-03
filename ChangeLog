@@ -1,3 +1,14 @@
+2008-10-30 10:27  david_nichols
+
+	* Makefile.am, qore-xmlsec-module.spec, src/Makefile.am: added
+	  release notes to dist
+
+2008-10-30 09:18  david_nichols
+
+	* ChangeLog, README, RELEASE-NOTES, configure.ac,
+	  qore-xmlsec-module.spec: updated to qore 0.7.1 module handling,
+	  updated release to 0.0.2
+
 2008-10-24 07:55  david_nichols
 
 	* src/Makefile.am: do not link modules with the qore library
