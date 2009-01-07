@@ -1,4 +1,12 @@
 -------------
+Version 0.0.3
+-------------
+
+updated configure to check the directory specified with --prefix first when
+looking for dependent libraries
+
+
+-------------
 Version 0.0.2
 -------------
 
@@ -11,6 +19,7 @@ fixed module naming and module directory handling to correspond to changes in
 qore 0.7.1
 
 made qore 0.7.1 the minimum version for compiling the module
+
 
 -------------
 Version 0.0.1

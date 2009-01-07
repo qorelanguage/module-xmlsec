@@ -1,7 +1,7 @@
 # Process this file with autoconf to produce a configure script.
 
 # AC_PREREQ(2.59)
-AC_INIT([qore-xmlsec-module], [0.0.2],
+AC_INIT([qore-xmlsec-module], [0.0.3],
         [David Nichols <nicholsman@gmail.com>],
         [qore-xmlsec-module])
 AM_INIT_AUTOMAKE
@@ -14,7 +14,8 @@ AC_DISABLE_STATIC
 AC_LIBTOOL_DLOPEN
 AM_PROG_LIBTOOL
 AC_PROG_INSTALL
-AC_PROG_RANLIB
+
+AC_CONFIG_MACRO_DIR([m4])
 
 #LT_PREREQ([2.2])
 #LT_INIT([disable-shared])
@@ -33,6 +34,11 @@ else
    if test $ARCH = i686 -o $ARCH = i586 -o $ARCH = athlon ; then
       ARCH=i386
    fi
+fi
+
+# set find prefix
+if test -n "$prefix" -a "$prefix" != "NONE"; then
+   find_prefix="$prefix"
 fi
 
 #AC_CANONICAL_HOST
@@ -197,8 +203,7 @@ AC_ARG_ENABLE([single-compilation-unit],
       esac],
   [enable_single_compilation_unit=yes])
 
-set_xmlsec_cppflags()
-{
+set_xmlsec_cppflags() {
     XMLSEC_INC_DIR=$1
     XMLSEC_CPPFLAGS="-DXMLSEC_CRYPTO=\\\"openssl\\\" -DXMLSEC_CRYPTO_DYNAMIC_LOADING=1 -D__XMLSEC_FUNCTION__=__FUNCTION__ -DXMLSEC_NO_SIZE_T -DXMLSEC_NO_XKMS=1"
     if test "$1" != "/usr/include"; then
@@ -207,8 +212,7 @@ set_xmlsec_cppflags()
 
 }
 
-find_xmlsec()
-{
+find_xmlsec() {
     lib=$1/lib${LIBSUFFIX}
 
     # if we only want the static xmlsec libraries
@@ -266,7 +270,7 @@ AC_ARG_WITH([xmlsec-dir],
   [with_xmlsec_dir="$XMLSEC_DIR"])
 
 AC_MSG_CHECKING([for xmlsec libraries and header files])
-for dir in "${with_xmlsec_dir}" /usr / /usr/local /opt/gnu /opt/xmlsec /usr/local/xmlsec /opt/local /sw /usr/sfw /opt/sfw; do
+for dir in "${with_xmlsec_dir}" "${find_prefix}" /usr / /usr/local /opt/gnu /opt/xmlsec /usr/local/xmlsec /opt/local /sw /usr/sfw /opt/sfw; do
     find_xmlsec $dir
     if test -n "$XMLSEC_LDFLAGS"; then
         break
@@ -276,16 +280,14 @@ if test -z "$XMLSEC_LDFLAGS"; then
     AC_MSG_ERROR([no xmlsec library found])
 fi
 
-set_libxml2_cppflags()
-{
+set_libxml2_cppflags() {
     LIBXML2_INC_DIR=$1
     if test "$1" != "/usr/include"; then
         LIBXML2_CPPFLAGS=-I$1
     fi
 }
 
-find_libxml2()
-{
+find_libxml2() {
     lib=$1/lib${LIBSUFFIX}
     # if we only want the static libxml2 libraries
     if test -n "$libxml2_static"; then
@@ -350,7 +352,7 @@ AC_ARG_WITH([libxml2-dir],
   [with_libxml2_dir="$LIBXML2_DIR"])
 
 AC_MSG_CHECKING([for libxml2 libraries and header files])
-for dir in "${with_libxml2_dir}" /usr / /usr/local /opt/gnu /opt/libxml2 /usr/local/libxml2 /opt/local /sw /usr/sfw /opt/sfw; do
+for dir in "${with_libxml2_dir}" "${find_prefix} "/usr / /usr/local /opt/gnu /opt/libxml2 /usr/local/libxml2 /opt/local /sw /usr/sfw /opt/sfw; do
     find_libxml2 $dir
     if test -n "$LIBXML2_LDFLAGS"; then
         break
@@ -370,16 +372,14 @@ else
     AC_MSG_ERROR([no libxml2 library found])
 fi
 
-set_qore_cppflags()
-{
+set_qore_cppflags() {
     QORE_INC_DIR=$1
     if test "$1" != "/usr/include"; then
         QORE_CPPFLAGS=-I$1
     fi
 }
 
-find_qore()
-{
+find_qore() {
     lib=$1/lib${LIBSUFFIX}
 
     # if we only want the static qore libraries
@@ -433,7 +433,7 @@ AC_ARG_WITH([qore-dir],
   [with_qore_dir="$QORE_DIR"])
 
 AC_MSG_CHECKING([for qore libraries and header files])
-for dir in "${with_qore_dir}" /usr / /usr/local /opt/gnu /opt/qore /usr/local/qore /opt/local /sw /usr/sfw /opt/sfw; do
+for dir in "${with_qore_dir}" "${find_prefix}" /usr / /usr/local /opt/gnu /opt/qore /usr/local/qore /opt/local /sw /usr/sfw /opt/sfw; do
     find_qore $dir
     if test -n "$QORE_LDFLAGS"; then
         break
