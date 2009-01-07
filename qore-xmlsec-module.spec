@@ -53,14 +53,9 @@ Requires: /usr/bin/env
 Requires: qore-module-api-%{module_api}
 BuildRequires: gcc-c++
 BuildRequires: qore-devel
-%if 0%{?suse_version}
-Requires: libxmlsec1
-BuildRequires: libxmlsec1-devel
-%else
 Requires: xmlsec1
 Requires: xmlsec1-openssl
 BuildRequires: xmlsec1-devel
-%endif
 BuildRequires: qore
 
 %description
