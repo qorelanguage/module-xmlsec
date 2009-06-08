@@ -1,5 +1,5 @@
 %define module_api %(qore --module-api 2>/dev/null)
-%define module_dir %(qore --module-dir 2>/dev/null)
+%define module_dir %{_libdir}/qore-modules
 
 %if 0%{?sles_version}
 
@@ -69,9 +69,6 @@ standards from the xmlsec library.
 
 %prep
 %setup -q
-%ifarch x86_64 ppc64 x390x
-c64=--enable-64bit
-%endif
 ./configure RPM_OPT_FLAGS="$RPM_OPT_FLAGS" --prefix=/usr --disable-debug $c64
 
 %build
