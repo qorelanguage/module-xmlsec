@@ -52,19 +52,16 @@ class DSigCtx {
    public:
       xmlSecDSigCtxPtr dsigCtx;
 
-      DLLLOCAL DSigCtx() : dsigCtx(xmlSecDSigCtxCreate(0))
-      {
+      DLLLOCAL DSigCtx() : dsigCtx(xmlSecDSigCtxCreate(0)) {
       }
 
-      DLLLOCAL ~DSigCtx()
-      {
+      DLLLOCAL ~DSigCtx() {
 	 if (dsigCtx)
 	    xmlSecDSigCtxDestroy(dsigCtx);
       }
 
       // takes over ownership of key
-      DLLLOCAL void setKey(xmlSecKeyPtr key)
-      {
+      DLLLOCAL void setKey(xmlSecKeyPtr key) {
 	 dsigCtx->signKey = key;
       }
 
@@ -81,8 +78,7 @@ class DSigCtx {
 	 return 0;
       }
 
-      DLLLOCAL int verify(xmlNodePtr node, ExceptionSink *xsink)
-      {
+      DLLLOCAL int verify(xmlNodePtr node, ExceptionSink *xsink) {
 	 if (xmlSecDSigCtxVerify(dsigCtx, node) < 0) {
 	    xsink->raiseException("XMLSEC-DSIGCTX-ERROR", "signature could not be verified");
 	    return -1;
@@ -90,15 +86,13 @@ class DSigCtx {
 	 return 0;
       }
 
-      DLLLOCAL operator bool() const
-      {
+      DLLLOCAL operator bool() const {
 	 return (bool)dsigCtx;
       }
 
-      DLLLOCAL bool getStatus() { return dsigCtx->status; }
+      DLLLOCAL xmlSecDSigStatus getStatus() { return dsigCtx->status; }
 
-      DLLLOCAL bool getTransformStatus() 
-      {
+      DLLLOCAL xmlSecTransformStatus getTransformStatus() {
 	 assert(dsigCtx->signMethod);
 	 return dsigCtx->signMethod->status;
       }
@@ -491,13 +485,11 @@ static AbstractQoreNode *f_XmlSec_verify(const QoreListNode *args, ExceptionSink
    return 0;
 }
 
-static void XMLSEC_constructor(QoreObject *self, const QoreListNode *params, ExceptionSink *xsink)
-{
+static void XMLSEC_constructor(QoreObject *self, const QoreListNode *params, ExceptionSink *xsink) {
    xsink->raiseException("XMLSEC-CONSTRUCTOR-ERROR", "This class contains only static methods and cannot be instantiated");
 }
 
-QoreStringNode *xmlsec_module_init()
-{
+QoreStringNode *xmlsec_module_init() {
    xmlLoadExtDtdDefaultValue = XML_DETECT_IDS | XML_COMPLETE_ATTRS;
    xmlSubstituteEntitiesDefault(1);
 #ifndef XMLSEC_NO_XSLT
