@@ -253,11 +253,14 @@ set_xmlsec_cppflags() {
     if test "$1" != "/usr/include"; then
         XMLSEC_CPPFLAGS="$XMLSEC_CPPFLAGS -I$1"
     fi
-
 }
 
 find_xmlsec() {
-    lib=$1/lib${LIBSUFFIX}
+    a="$1"
+    if test \( "$a" = "/" -o -z "$a" \) -a -h "$a/lib${LIBSUFFIX}"; then
+        a=/usr
+    fi
+    lib=$a/lib${LIBSUFFIX}
 
     # if we only want the static xmlsec libraries
     if test -n "$xmlsec_static"; then
@@ -286,10 +289,10 @@ find_xmlsec() {
 
     AC_MSG_CHECKING([for xmlsec include files])
     # try to find include files
-    if test "$1" = "/"; then
+    if test "$a" = "/"; then
         inc=/usr/include
     else
-        inc=$1/include
+        inc=$a/include
     fi
     if test -f "$inc/xmlsec/xmlsec.h"; then
         AC_MSG_RESULT([found: $inc])
@@ -332,7 +335,12 @@ set_libxml2_cppflags() {
 }
 
 find_libxml2() {
-    lib=$1/lib${LIBSUFFIX}
+    a="$1"
+    if test \( "$a" = "/" -o -z "" \) -a -h "$a/lib${LIBSUFFIX}"; then
+        a=/usr
+    fi
+    lib=$a/lib${LIBSUFFIX}
+
     # if we only want the static libxml2 libraries
     if test -n "$libxml2_static"; then
     	if test -f "$lib/libxml2.a"; then
@@ -359,10 +367,10 @@ find_libxml2() {
     fi
     AC_MSG_CHECKING([for libxml2 include files])
     # try to find include files
-    if test "$1" = "/"; then
+    if test "$a" = "/"; then
         inc=/usr/include
     else
-        inc=$1/include
+        inc=$a/include
     fi
     if test -f "$inc/libxml/xmlversion.h"; then
         AC_MSG_RESULT([found: $inc])
@@ -424,7 +432,11 @@ set_qore_cppflags() {
 }
 
 find_qore() {
-    lib=$1/lib${LIBSUFFIX}
+    a="$1"
+    if test \( "$a" = "/" -o -z "" \) -a -h "$a/lib${LIBSUFFIX}"; then
+        a=/usr
+    fi
+    lib=$a/lib${LIBSUFFIX}
 
     # if we only want the static qore libraries
     if test -n "$qore_static"; then
@@ -453,10 +465,10 @@ find_qore() {
 
     AC_MSG_CHECKING([for qore include files])
     # try to find include files
-    if test "$1" = "/"; then
+    if test "$a" = "/"; then
         inc=/usr/include
     else
-        inc=$1/include
+        inc=$a/include
     fi
     if test -f "$inc/qore/Qore.h"; then
         AC_MSG_RESULT([found: $inc])
@@ -675,8 +687,7 @@ else
    printf " (32-bit)\n"
 fi
 
-show_library_feature()
-{
+show_library_feature() {
    printf "%-24s: " "$1"
    if test "$2" = "yes"; then
       printf "%-8s" yes
