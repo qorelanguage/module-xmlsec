@@ -417,7 +417,7 @@ AC_ARG_WITH([libxml2-dir],
   [with_libxml2_dir="$LIBXML2_DIR"])
 
 AC_MSG_CHECKING([for libxml2 libraries and header files])
-for dir in "${with_libxml2_dir}" "${find_prefix} "/usr / /usr/local /opt/gnu /opt/libxml2 /usr/local/libxml2 /opt/local /sw /usr/sfw /opt/sfw; do
+for dir in "${with_libxml2_dir}" "${find_prefix}" /usr / /usr/local /opt/gnu /opt/libxml2 /usr/local/libxml2 /opt/local /sw /usr/sfw /opt/sfw; do
     find_libxml2 $dir
     if test -n "$LIBXML2_LDFLAGS"; then
         break
