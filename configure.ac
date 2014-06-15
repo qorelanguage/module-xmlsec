@@ -273,21 +273,36 @@ find_xmlsec() {
     if test \( "$a" = "/" -o -z "$a" \) -a -h "$a/lib${LIBSUFFIX}"; then
         a=/usr
     fi
-    lib=$a/lib${LIBSUFFIX}
+    lib=$a/lib
 
     # if we only want the static xmlsec libraries
     if test -n "$xmlsec_static"; then
-        if test -f "$lib/libxmlsec1.a"; then
+        if test -f "$lib${LIBSUFFIX}/libxmlsec1.a"; then
+            XMLSEC_LDFLAGS="$lib${LIBSUFFIX}/libxmlsec1.a"
+            AC_MSG_RESULT([$lib${LIBSUFFIX} (forced static)])
+        elif test -f "$lib/libxmlsec1.a"; then
             XMLSEC_LDFLAGS="$lib/libxmlsec1.a"
             AC_MSG_RESULT([$lib (forced static)])
         fi
     else
-        if test -f "$lib/libxmlsec1.${SHLIB_SUFFIX}"; then
+        if test -f "$lib${LIBSUFFIX}/libxmlsec1.${SHLIB_SUFFIX}"; then
+            if test "$lib" != "/lib" -a "$lib" != "/usr/lib"; then
+                XMLSEC_LDFLAGS="-L$lib{LIBSUFFIX}"
+            fi
+            XMLSEC_LDFLAGS="$XMLSEC_LDFLAGS -lxmlsec1"
+            AC_MSG_RESULT([$lib (shared)])
+        elif test -f "$lib/libxmlsec1.${SHLIB_SUFFIX}"; then
             if test "$lib" != "/lib" -a "$lib" != "/usr/lib"; then
                 XMLSEC_LDFLAGS="-L$lib"
             fi
             XMLSEC_LDFLAGS="$XMLSEC_LDFLAGS -lxmlsec1"
             AC_MSG_RESULT([$lib (shared)])
+        elif test -f "$lib${LIBSUFFIX}/libxmlsec1.a"; then
+            if test "$lib" != "/lib" -a "$lib" != "/usr/lib"; then
+                XMLSEC_LDFLAGS="-L$lib${LIBSUFFIX}"
+            fi
+            XMLSEC_LDFLAGS="$XMLSEC_LDFLAGS -lxmlsec1"
+            AC_MSG_RESULT([$lib (static)])
         elif test -f "$lib/libxmlsec1.a"; then
             if test "$lib" != "/lib" -a "$lib" != "/usr/lib"; then
                 XMLSEC_LDFLAGS="-L$lib"
