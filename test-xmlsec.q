@@ -3,6 +3,9 @@
 # requires the xmlsec module
 %requires xmlsec
 
+# requires the xml module
+%requires xml
+
 # execute the xmlsec_test class as the application class
 %exec-class xmlsec_test
 
