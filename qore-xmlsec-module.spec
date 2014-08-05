@@ -62,7 +62,7 @@ standards from the xmlsec library.
 
 %prep
 %setup -q
-./configure RPM_OPT_FLAGS="$RPM_OPT_FLAGS" --prefix=/usr --disable-debug $c64
+./configure RPM_OPT_FLAGS="$RPM_OPT_FLAGS" --prefix=/usr --disable-debug
 
 %build
 %{__make}
