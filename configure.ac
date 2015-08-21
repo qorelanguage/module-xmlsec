@@ -59,7 +59,7 @@ esac
 SHLIB_SUFFIX=so
 #echo host_os=${host_os}sss
 case "${host_os}" in
-     *linux*)   AC_DEFINE(NEED_ICONV_TRANSLIT, 1, Define to 1 if //TRANSLIT should be added to the destination character set code) 
+     *linux*)   AC_DEFINE(NEED_ICONV_TRANSLIT, 1, Define to 1 if //TRANSLIT should be added to the destination character set code)
 		# set compile flags for Linux
 		CPPFLAGS="${CPPFLAGS} -D_GNU_SOURCE"
 		SHLIB_SUFFIX=so
@@ -123,10 +123,10 @@ if test "$enable_64bit" = "auto"; then
    # turn on 64-bit by default if compiling on a 64-bit platform
    case "${host_cpu}" in
        *64*)
-                 enable_64bit=yes 
+                 enable_64bit=yes
                  ;;
        s390x)
-                 enable_64bit=yes 
+                 enable_64bit=yes
                  ;;
        *)        case "${host_os}" in
                      darwin*)   mv=`uname -r|cut -f1 -d.`
@@ -303,7 +303,7 @@ find_xmlsec() {
     else
         if test -f "$lib${LIBSUFFIX}/libxmlsec1.${SHLIB_SUFFIX}"; then
             if test "$lib" != "/lib" -a "$lib" != "/usr/lib"; then
-                XMLSEC_LDFLAGS="-L$lib{LIBSUFFIX}"
+                XMLSEC_LDFLAGS="-L$lib${LIBSUFFIX}"
             fi
             XMLSEC_LDFLAGS="$XMLSEC_LDFLAGS -lxmlsec1"
             AC_MSG_RESULT([$lib (shared)])
@@ -673,7 +673,7 @@ if test "$enable_optimization" = "yes"; then
     elif test "$CXX" = "CC" -a "`echo $host_os|cut -b-7`" = "solaris"; then
         # remove -g with Solaris CC as it reduces optimization levels
 	CXXFLAGS="`echo $CXXFLAGS| sed s/-g//` -xO5" # Solaris CC
-    elif test -n "`echo $CXX|grep aCC`"; then 
+    elif test -n "`echo $CXX|grep aCC`"; then
         # remove -g with HP-UX aCC as it reduces optimization levels
 	CXXFLAGS="`echo $CXXFLAGS| sed s/-g//` +O4" # HP-UX aCC
     fi
