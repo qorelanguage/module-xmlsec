@@ -582,6 +582,82 @@ else
     AC_MSG_ERROR([no libxml2 library found])
 fi
 
+set_libxslt_cppflags() {
+    LIBXSLT_INC_DIR=$1
+    if test "$1" != "/usr/include"; then
+        LIBXSLT_CPPFLAGS=-I$1
+    fi
+}
+
+find_libxslt() {
+    a="$1"
+    if test \( "$a" = "/" -o -z "" \) -a -h "$a/lib${LIBSUFFIX}"; then
+        a=/usr
+    fi
+    lib=$a/lib${LIBSUFFIX}
+
+    # if we only want the static libxslt libraries
+    if test -n "$libxslt_static"; then
+    	if test -f "$lib/libxslt.a"; then
+	    LIBXSLT_LDFLAGS="$lib/libxslt.a"
+       	    AC_MSG_RESULT([$lib (forced static)])
+    	fi
+    else
+        if test -f "$lib/libxslt.${SHLIB_SUFFIX}"; then
+	    if test "$lib" != "/lib" -a "$lib" != "/usr/lib"; then
+       	        LIBXSLT_LDFLAGS="-L$lib"
+    	    fi
+	    LIBXSLT_LDFLAGS="$LIBXSLT_LDFLAGS -lxslt"
+       	    AC_MSG_RESULT([$lib (shared)])
+    	elif test -f "$lib/libxslt.a"; then
+	    if test "$lib" != "/lib" -a "$lib" != "/usr/lib"; then
+       	        LIBXSLT_LDFLAGS="-L$lib"
+    	    fi
+	    LIBXSLT_LDFLAGS="$LIBXSLT_LDFLAGS -lxslt"
+       	    AC_MSG_RESULT([$lib (static)])
+    	fi
+    fi
+    if test -z "$LIBXSLT_LDFLAGS"; then
+        return
+    fi
+    AC_MSG_CHECKING([for libxslt include files])
+    # try to find include files
+    if test "$a" = "/"; then
+        inc=/usr/include
+    else
+        inc=$a/include
+    fi
+    if test -f "$inc/libxslt/xslt.h"; then
+        AC_MSG_RESULT([found: $inc])
+        set_libxslt_cppflags $inc
+    else
+	AC_MSG_ERROR([not found])
+    fi
+
+    AC_SUBST(LIBXSLT_LDFLAGS)
+    AC_SUBST(LIBXSLT_CPPFLAGS)
+}
+
+# see if we can figure out where the libxslt library is
+AC_ARG_WITH([libxslt-dir],
+  [AS_HELP_STRING([--with-libxslt-dir@<:@=DIR@:>@],
+                  [LIBXSLT directory])],
+  [if test ! -d "${with_libxslt_dir}"; then AC_MSG_ERROR(bad value ${with_libxslt_dir} for --with-libxslt-dir); unset with_libxslt_dir; fi],
+  [with_libxslt_dir="$LIBXSLT_DIR"])
+
+AC_MSG_CHECKING([for libxslt libraries and header files])
+for dir in "${with_libxslt_dir}" "${find_prefix}" /usr / /usr/local /opt/gnu /opt/libxslt /usr/local/libxslt /opt/local /sw /usr/sfw /opt/sfw; do
+    find_libxslt $dir
+    if test -n "$LIBXSLT_LDFLAGS"; then
+        break
+    fi
+done
+if test -n "$LIBXSLT_LDFLAGS"; then
+    AC_MSG_RESULT([found])
+else
+    AC_MSG_ERROR([no libxslt library found])
+fi
+
 set_qore_cppflags() {
     QORE_INC_DIR=$1
     if test "$1" != "/usr/include"; then
