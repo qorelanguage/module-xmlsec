@@ -19,5 +19,7 @@
 #include <xmlsec/crypto.h>
 #include <xmlsec/errors.h>
 
+#define NEED_XMLSEC_BIG_LOCK 1
+
 #include "QoreXmlSecKeyDataIdNode.h"
 #include "QoreXmlSecKeyDataFormatNode.h"

@@ -1,0 +1,194 @@
+/*
+    QC_XmlSecKey.qpp
+
+    Qore Programming Language
+
+    Copyright 2003 - 2018 Qore Technologies, s.r.o.
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
+
+#include "qore-xmlsec.h"
+
+#include <qore/QoreSSLCertificate.h>
+
+#include "QC_XmlSecKey.h"
+
+//! The \c XmlSecKey class implements an \c xmlsec key (wrapper for an \c xmlSecKey C++ structure
+/**
+*/
+qclass XmlSecKey [arg=QoreXmlSecKey* key; ns=Qore::XmlSec];
+
+//! Creates a new \c XmlSecKey based on the arguments passed.
+/** @par Example:
+    @code{.py}
+XmlSec key(key_pem, xmlSecKeyDataFormatPem, password);
+    @endcode
+
+    @param key the key in PEM or DER format
+    @param the format of the key (for possible values, see @ref XXX)
+    @param the optional password for the key
+
+    Creates a new key based on key data (for example, in PEM or DER format), the second argument will normally be xmlSecKeyDataFormatPem or xmlSecKeyDataFormatDer.
+
+    The password argument is required for private keys with a password.
+*/
+XmlSecKey::constructor(data key, int format, *string password) {
+    const char* ptr;
+    size_t len;
+    q_get_data(key, ptr, len);
+
+    SimpleRefHolder<QoreXmlSecKey> key(new QoreXmlSecKey(xsink, (xmlSecByte*)ptr, len,
+        (xmlSecKeyDataFormat)format, password ? password->c_str() : nullptr));
+    if (*xsink)
+        return;
+    self->setPrivate(CID_XMLSECKEY, key.release());
+}
+
+//! Creates a new \c XmlSecKey based on the arguments passed.
+/** @par Example:
+    @code{.py}
+XmlSec key(str, num_bits, type);
+    @endcode
+
+    @param key the key in PEM or DER format
+    @param the format of the key (for possible values, see @ref XXX)
+    @param the optional password for the key
+
+    Creates a new key based on key data (for example, in PEM or DER format), the second argument will normally be xmlSecKeyDataFormatPem or xmlSecKeyDataFormatDer.
+
+    The password argument is required for private keys with a password.
+*/
+XmlSecKey::constructor(string str, int num_bits, int type) {
+    SimpleRefHolder<QoreXmlSecKey> key(new QoreXmlSecKey((const xmlChar*)str->c_str(), num_bits, (xmlSecKeyDataType)type, xsink));
+    if (*xsink)
+        return;
+
+    self->setPrivate(CID_XMLSECKEY, key.release());
+}
+
+/*
+// new XmlSecKey(id, num_bits, type)
+static void XMLSECKEY_constructor(QoreObject *self, const QoreListNode *params, ExceptionSink *xsink)
+{
+   const AbstractQoreNode *p = get_param(params, 0);
+
+   qore_type_t t = p->getType();
+   if (t == NT_XMLSECKEYDATAID) {
+      const QoreXmlSecKeyDataIdNode *id = reinterpret_cast<const QoreXmlSecKeyDataIdNode *>(p);
+
+      p = get_param(params, 1);
+      int num_bits = p ? p->getAsInt() : 0;
+
+      p = get_param(params, 2);
+      xmlSecKeyDataType type = p ? p->getAsInt() : xmlSecKeyDataTypeUnknown;
+
+      SimpleRefHolder<QoreXmlSecKey> key(new QoreXmlSecKey(id->getID(), num_bits, type, xsink));
+      if (*xsink)
+         return;
+
+      self->setPrivate(CID_XMLSECKEY, key.release());
+      return;
+   }
+
+   xsink->raiseException("XMLSECKEY-CONSTRUCTOR-ERROR", "expecting string, binary, or xmlSecKeyDataId type as first argument to XmlSecKey::constructor(), got type '%s'", p ? p->getTypeName() : "NOTHING");
+}
+*/
+
+//! Creates a new XmlSecKey object based on the original
+/** @par Example:
+    @code{.py}
+XmlSecKey nk = k.copy();
+    @endcode
+*/
+XmlSecKey::copy() {
+    QoreXmlSecKey *nk = key->copy(xsink);
+    if (!nk) {
+        assert(*xsink);
+        return;
+    }
+
+    self->setPrivate(CID_XMLSECKEY, nk);
+}
+
+//! Assigns an X.509 certificate to the \c XmlSecKey object
+/** @par Example:
+    @code{.py}
+key.setCertificate(cert_pem, xmlSecKeyDataFormatCertPem);
+    @endcode
+
+    @param key the key in PEM or DER format
+    @param the format of the key (for possible values, see @ref XXX)
+*/
+nothing XmlSecKey::setCertificate(data key, int format) {
+    const char* ptr;
+    size_t len;
+    q_get_data(key, ptr, len);
+
+    key->setCertificate((xmlSecByte*)ptr, len, (xmlSecKeyDataFormat)format, xsink);
+}
+
+//! Assigns an X.509 certificate to the \c XmlSecKey object
+/** @par Example:
+    @code{.py}
+key.setCertificate(cert);
+    @endcode
+
+    @param cert X.509 certificate to set
+*/
+nothing XmlSecKey::setCertificate(SSLCertificate[QoreSSLCertificate] cert)) {
+    ReferenceHolder<QoreSSLCertificate> holder(cert, xsink);
+    SimpleRefHolder<QoreStringNode> cert_pem(c->getPEM(xsink));
+    if (*xsink)
+        return QoreValue();
+
+    key->setCertificate((xmlSecByte*)cert_pem->c_str(), cert_pem->size(), xmlSecKeyDataFormatCertPem, xsink);
+}
+
+//! Sets the key name in the \c XmlSecKey object
+/** @par Example:
+    @code{.py}
+key.setName(name);
+    @endcode
+
+    @throw XMLSECKEY-ERROR error reported by libxmlsec setting the name
+*/
+nothing XmlSecKey::setName(string name) {
+    key->setName(str->c_str(), xsink);
+}
+
+//! Returns the key name; if no key name is set, returns @ref nothing
+/** @par Example:
+    @code{.py}
+*string name = key.getName();
+    @endcode
+
+    @throw XMLSECKEY-ERROR error reported by libxmlsec getting the name
+*/
+string XmlSecKey::getName() [flags=RET_VALUE_ONLY] {
+    return key->getName(xsink);
+}
+
+//! Returns the key's type as an integer value; see @ref XXX for possible values
+/** @par Example:
+    @code{.py}
+int type = key.getType());
+    @endcode
+
+    @throw XMLSECKEY-ERROR error reported by libxmlsec getting the type
+*/
+int XmlSecKey::getType() [flags=RET_VALUE_ONLY] {
+    return (int64)key->getType(xsink);
+}
