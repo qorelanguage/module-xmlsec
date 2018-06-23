@@ -64,12 +64,10 @@ XmlSec key(str, num_bits, type);
     @endcode
 
     @param key the key in PEM or DER format
-    @param the format of the key (for possible values, see @ref XXX)
-    @param the optional password for the key
+    @param num_bits the number of bits
+    @param type the key type; see @ref xmlsec_keydatatype_constants for possible values
 
     Creates a new key based on key data (for example, in PEM or DER format), the second argument will normally be xmlSecKeyDataFormatPem or xmlSecKeyDataFormatDer.
-
-    The password argument is required for private keys with a password.
 */
 XmlSecKey::constructor(string str, int num_bits, int type) {
     SimpleRefHolder<QoreXmlSecKey> key(new QoreXmlSecKey((const xmlChar*)str->c_str(), num_bits, (xmlSecKeyDataType)type, xsink));
@@ -79,33 +77,32 @@ XmlSecKey::constructor(string str, int num_bits, int type) {
     self->setPrivate(CID_XMLSECKEY, key.release());
 }
 
-/*
-// new XmlSecKey(id, num_bits, type)
-static void XMLSECKEY_constructor(QoreObject *self, const QoreListNode *params, ExceptionSink *xsink)
-{
-   const AbstractQoreNode *p = get_param(params, 0);
+//! Creates a new \c XmlSecKey based on the arguments passed.
+/** @par Example:
+    @code{.py}
+XmlSec key(int id, num_bits, type);
+    @endcode
 
-   qore_type_t t = p->getType();
-   if (t == NT_XMLSECKEYDATAID) {
-      const QoreXmlSecKeyDataIdNode *id = reinterpret_cast<const QoreXmlSecKeyDataIdNode *>(p);
+    @param id in inteeger constant giving the key ID; see @ref xmlsec_keydataid_constants for possible values
+    @param num_bits the number of bits
+    @param type the key type; see @ref xmlsec_keydatatype_constants for possible values
 
-      p = get_param(params, 1);
-      int num_bits = p ? p->getAsInt() : 0;
-
-      p = get_param(params, 2);
-      xmlSecKeyDataType type = p ? p->getAsInt() : xmlSecKeyDataTypeUnknown;
-
-      SimpleRefHolder<QoreXmlSecKey> key(new QoreXmlSecKey(id->getID(), num_bits, type, xsink));
-      if (*xsink)
-         return;
-
-      self->setPrivate(CID_XMLSECKEY, key.release());
-      return;
-   }
-
-   xsink->raiseException("XMLSECKEY-CONSTRUCTOR-ERROR", "expecting string, binary, or xmlSecKeyDataId type as first argument to XmlSecKey::constructor(), got type '%s'", p ? p->getTypeName() : "NOTHING");
-}
+    @throw XMLSECKEY-KEYID-ERROR invalid key ID given
 */
+XmlSecKey::constructor(int id, int num_bits, int type) {
+    xmlSecKeyDataId keyid = xmlsec_get_keydata_id(id);
+    if (!keyid) {
+        xsink->raiseException("XMLSECKEY-KEYID-ERROR", "invalid key ID %d given", id);
+        return;
+    }
+
+    SimpleRefHolder<QoreXmlSecKey> key(new QoreXmlSecKey(keyid, num_bits, (xmlSecKeyDataType)type, xsink));
+    if (*xsink) {
+        return;
+    }
+
+    self->setPrivate(CID_XMLSECKEY, key.release());
+}
 
 //! Creates a new XmlSecKey object based on the original
 /** @par Example:

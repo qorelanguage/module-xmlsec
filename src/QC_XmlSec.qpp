@@ -28,6 +28,81 @@
 #include "QoreXmlSecEncCtx.h"
 #include "DSigCtx.h"
 
+/** @defgroup xmlsec_constants xmlsec Module Constants
+    xmlsec module constants
+*/
+//@{
+const ModuleVersion = qore(new QoreStringNode(PACKAGE_VERSION));
+//@}
+
+/** @defgroup xmlsec_keydataid_constants xmlsec Key Data ID Constants
+    Key data ID constants
+*/
+//@{
+//! AES
+const xmlSecKeyDataAesId = XMLSEC_KEYDATA_AESID;
+//! DES
+const xmlSecKeyDataDesId = XMLSEC_KEYDATA_DESID;
+//! DSA
+const xmlSecKeyDataDsaId = XMLSEC_KEYDATA_DSAID;
+//! HMAC
+const xmlSecKeyDataHmacId = XMLSEC_KEYDATA_HMACID;
+//! RSA
+const xmlSecKeyDataRsaId = XMLSEC_KEYDATA_RSAID;
+//! X.509
+const xmlSecKeyDataX509Id = XMLSEC_KEYDATA_X509ID;
+//! Raw X.509 certificate
+const xmlSecKeyDataRawX509CertId = XMLSEC_KEYDATA_RAWX509CERTID;
+//@}
+
+/** @defgroup xmlsec_keydataformat_constants xmlsec Key Format Constants
+    Key data format constants
+*/
+//@{
+//! unknown
+const xmlSecKeyDataFormatUnknown = xmlSecKeyDataFormatUnknown;
+//! binary
+const xmlSecKeyDataFormatBinary = xmlSecKeyDataFormatBinary;
+//! PEM
+const xmlSecKeyDataFormatPem = xmlSecKeyDataFormatPem;
+//! DER
+const xmlSecKeyDataFormatDer = xmlSecKeyDataFormatDer;
+//! PKCS8PEM
+const xmlSecKeyDataFormatPkcs8Pem = xmlSecKeyDataFormatPkcs8Pem;
+//! PKCS8DER
+const xmlSecKeyDataFormatPkcs8Der = xmlSecKeyDataFormatPkcs8Der;
+//! PKCS12
+const xmlSecKeyDataFormatPkcs12 = xmlSecKeyDataFormatPkcs12;
+//! Certificate PEM
+const xmlSecKeyDataFormatCertPem = xmlSecKeyDataFormatCertPem;
+//! Certificate DER
+const xmlSecKeyDataFormatCertDer = xmlSecKeyDataFormatCertDer;
+//@
+
+/** @defgroup xmlsec_keydatatype_constants xmlsec Key Type Constants
+    Key data type constants
+*/
+//@{
+//! unknown
+const xmlSecKeyDataTypeUnknown = xmlSecKeyDataTypeUnknown;
+//! none
+const xmlSecKeyDataTypeNone = xmlSecKeyDataTypeNone;
+//! public
+const xmlSecKeyDataTypePublic = xmlSecKeyDataTypePublic;
+//! private
+const xmlSecKeyDataTypePrivate = xmlSecKeyDataTypePrivate;
+//! symmetric
+const xmlSecKeyDataTypeSymmetric = xmlSecKeyDataTypeSymmetric;
+//! session
+const xmlSecKeyDataTypeSession = xmlSecKeyDataTypeSession;
+//! permanent
+const xmlSecKeyDataTypePermanent = xmlSecKeyDataTypePermanent;
+//! trusted
+const xmlSecKeyDataTypeTrusted = xmlSecKeyDataTypeTrusted;
+//! any
+const xmlSecKeyDataTypeAny = xmlSecKeyDataTypeAny;
+//@}
+
 //! The \c XmlSec class implements static methods for working with XmlSec keys
 /**
 */
