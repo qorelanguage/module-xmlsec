@@ -1,0 +1,82 @@
+/*
+    QC_XmlSecKeyManager.qpp
+
+    Qore Programming Language
+
+    Copyright 2003 - 2018 Qore Technologies, s.r.o.
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
+
+#include "qore-xmlsec.h"
+
+#include <qore/QoreSSLCertificate.h>
+
+#include "QC_XmlSecKeyManager.h"
+#include "QC_XmlSecKey.h"
+
+//! The \c XmlSecKeyManager class implements an xmlsec key manager (wrapper for a C++ \c xmlSecKeysManager structure)
+/**
+*/
+qclass XmlSecKeyManager [arg=QoreXmlSecKeyManager* mgr; ns=Qore::XmlSec];
+
+//! creates the object
+/** @par Example:
+    @code{.py}
+XmlSecKeyManager mgr();
+    @endcode
+
+    @throw XMLSECKEYMANAGER-ERROR error reported by \c libxmlsec creating or initializing the key manager
+*/
+XmlSecKeyManager::constructor() {
+    SimpleRefHolder<QoreXmlSecKeyManager> mgr(new QoreXmlSecKeyManager(xsink));
+    if (*xsink) {
+        return;
+    }
+
+    self->setPrivate(CID_XMLSECKEYMANAGER, mgr.release());
+}
+
+//! throws an exception; \c XmlSecKeyManager objects cannot be copied
+/** @throw XMLSECKEYMANAGER-COPY-ERROR XmlSecKeyManager objects cannot be copied
+*/
+XmlSecKeyManager::copy() {
+    xsink->raiseException("XMLSECKEYMANAGER-COPY-ERROR", "The XmlSecKeyManager class cannot be copied");
+}
+
+//! adds an @ref Qore::XmlSec::XmlSecKey "XmlSecKey" to the \c XmlSecKeyManager object
+/** @par Example:
+    @code{.py}
+mgr.addKey(key);
+    @endcode
+
+    @param key the key to add
+
+    @throw XMLSECKEYMANAGER-ERROR error reported by libxmlsec assigning the key to the key manager
+*/
+XmlSecKeyManager::addKey(XmlSecKey[QoreXmlSecKey] key) {
+    SimpleRefHolder<QoreXmlSecKey> holder(key);
+
+    xmlSecKeyPtr new_key = key->clone(xsink);
+    if (!new_key) {
+        assert(*xsink);
+        return QoreValue();
+    }
+
+    if (mgr->adoptKey(new_key, xsink)) {
+        assert(*xsink);
+        return QoreValue();
+    }
+}

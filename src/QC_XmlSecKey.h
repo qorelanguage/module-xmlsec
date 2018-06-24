@@ -27,7 +27,7 @@
 DLLLOCAL extern qore_classid_t CID_XMLSECKEY;
 DLLLOCAL extern QoreClass* QC_XMLSECKEY;
 
-DLLLOCAL QoreClass* initXmlSecKeyClass();
+DLLLOCAL QoreClass* initXmlSecKeyClass(QoreNamespace& ns);
 
 class QoreXmlSecKey : public AbstractPrivateData, public QoreThreadLock {
 private:

@@ -25,6 +25,9 @@
 #include <qore/QoreSSLCertificate.h>
 
 #include "QC_XmlSec.h"
+#include "QC_XmlSecKey.h"
+#include "QC_XmlSecKeyManager.h"
+#include "QoreXmlDoc.h"
 #include "QoreXmlSecEncCtx.h"
 #include "DSigCtx.h"
 
@@ -32,6 +35,8 @@
     xmlsec module constants
 */
 //@{
+namespace Qore::XmlSec;
+//! the version of this module
 const ModuleVersion = qore(new QoreStringNode(PACKAGE_VERSION));
 //@}
 
@@ -39,6 +44,7 @@ const ModuleVersion = qore(new QoreStringNode(PACKAGE_VERSION));
     Key data ID constants
 */
 //@{
+namespace Qore::XmlSec;
 //! AES
 const xmlSecKeyDataAesId = XMLSEC_KEYDATA_AESID;
 //! DES
@@ -59,24 +65,25 @@ const xmlSecKeyDataRawX509CertId = XMLSEC_KEYDATA_RAWX509CERTID;
     Key data format constants
 */
 //@{
+namespace Qore::XmlSec;
 //! unknown
-const xmlSecKeyDataFormatUnknown = xmlSecKeyDataFormatUnknown;
+const xmlSecKeyDataFormatUnknown = qore(xmlSecKeyDataFormatUnknown);
 //! binary
-const xmlSecKeyDataFormatBinary = xmlSecKeyDataFormatBinary;
+const xmlSecKeyDataFormatBinary = qore(xmlSecKeyDataFormatBinary);
 //! PEM
-const xmlSecKeyDataFormatPem = xmlSecKeyDataFormatPem;
+const xmlSecKeyDataFormatPem = qore(xmlSecKeyDataFormatPem);
 //! DER
-const xmlSecKeyDataFormatDer = xmlSecKeyDataFormatDer;
+const xmlSecKeyDataFormatDer = qore(xmlSecKeyDataFormatDer);
 //! PKCS8PEM
-const xmlSecKeyDataFormatPkcs8Pem = xmlSecKeyDataFormatPkcs8Pem;
+const xmlSecKeyDataFormatPkcs8Pem = qore(xmlSecKeyDataFormatPkcs8Pem);
 //! PKCS8DER
-const xmlSecKeyDataFormatPkcs8Der = xmlSecKeyDataFormatPkcs8Der;
+const xmlSecKeyDataFormatPkcs8Der = qore(xmlSecKeyDataFormatPkcs8Der);
 //! PKCS12
-const xmlSecKeyDataFormatPkcs12 = xmlSecKeyDataFormatPkcs12;
+const xmlSecKeyDataFormatPkcs12 = qore(xmlSecKeyDataFormatPkcs12);
 //! Certificate PEM
-const xmlSecKeyDataFormatCertPem = xmlSecKeyDataFormatCertPem;
+const xmlSecKeyDataFormatCertPem = qore(xmlSecKeyDataFormatCertPem);
 //! Certificate DER
-const xmlSecKeyDataFormatCertDer = xmlSecKeyDataFormatCertDer;
+const xmlSecKeyDataFormatCertDer = qore(xmlSecKeyDataFormatCertDer);
 //@
 
 /** @defgroup xmlsec_keydatatype_constants xmlsec Key Type Constants
@@ -84,23 +91,23 @@ const xmlSecKeyDataFormatCertDer = xmlSecKeyDataFormatCertDer;
 */
 //@{
 //! unknown
-const xmlSecKeyDataTypeUnknown = xmlSecKeyDataTypeUnknown;
+const xmlSecKeyDataTypeUnknown = qore(xmlSecKeyDataTypeUnknown);
 //! none
-const xmlSecKeyDataTypeNone = xmlSecKeyDataTypeNone;
+const xmlSecKeyDataTypeNone = qore(xmlSecKeyDataTypeNone);
 //! public
-const xmlSecKeyDataTypePublic = xmlSecKeyDataTypePublic;
+const xmlSecKeyDataTypePublic = qore(xmlSecKeyDataTypePublic);
 //! private
-const xmlSecKeyDataTypePrivate = xmlSecKeyDataTypePrivate;
+const xmlSecKeyDataTypePrivate = qore(xmlSecKeyDataTypePrivate);
 //! symmetric
-const xmlSecKeyDataTypeSymmetric = xmlSecKeyDataTypeSymmetric;
+const xmlSecKeyDataTypeSymmetric = qore(xmlSecKeyDataTypeSymmetric);
 //! session
-const xmlSecKeyDataTypeSession = xmlSecKeyDataTypeSession;
+const xmlSecKeyDataTypeSession = qore(xmlSecKeyDataTypeSession);
 //! permanent
-const xmlSecKeyDataTypePermanent = xmlSecKeyDataTypePermanent;
+const xmlSecKeyDataTypePermanent = qore(xmlSecKeyDataTypePermanent);
 //! trusted
-const xmlSecKeyDataTypeTrusted = xmlSecKeyDataTypeTrusted;
+const xmlSecKeyDataTypeTrusted = qore(xmlSecKeyDataTypeTrusted);
 //! any
-const xmlSecKeyDataTypeAny = xmlSecKeyDataTypeAny;
+const xmlSecKeyDataTypeAny = qore(xmlSecKeyDataTypeAny);
 //@}
 
 //! The \c XmlSec class implements static methods for working with XmlSec keys
@@ -121,7 +128,7 @@ XmlSec::constructor() {
 string xml = XmlSec::encrypt(str, encryption_template, key);
     @endcode
 
-    @param input_data the data to encrypt
+    @param str_data the string data to encrypt
     @param tmpl the XML template for encrypting the data
     @param key the key to use to encrypt the data
     @param manager the optional key manager to use for encryption
@@ -134,11 +141,7 @@ string xml = XmlSec::encrypt(str, encryption_template, key);
 
     @throw XMLSEC-ENCRYPT-ERROR error in arguments to the methods; encryption failed, libxmlsec error
 */
-static string XmlSec::encrypt(data input_data, string tmpl, XmlSecKey[XmlSecKey] key, *XmlSecKeyManager[XmlSecKeyManager] key_manager) {
-    const char* ptr;
-    size_t len;
-    q_get_data(input_data, ptr, len);
-
+static string XmlSec::encrypt(string str_data, string tmpl, XmlSecKey[QoreXmlSecKey] key, *XmlSecKeyManager[QoreXmlSecKeyManager] key_manager) {
     SimpleRefHolder<QoreXmlSecKey> holder(key);
     SimpleRefHolder<QoreXmlSecKeyManager> mgr_holder(key_manager);
 
@@ -174,14 +177,6 @@ static string XmlSec::encrypt(data input_data, string tmpl, XmlSecKey[XmlSecKey]
 
     encCtx.setKey(new_key);
 
-    if (bin_data) {
-        if (encCtx.encryptBinary(node, bin_data)) {
-            xsink->raiseException("XMLSEC-ENCRYPT-ERROR", "encryption failed");
-            return QoreValue();
-        }
-        return doc.getString();
-    }
-
     // do XML encryption
     TempEncodingHelper edoc_utf8(str_data, QCS_UTF8, xsink);
     if (!edoc_utf8) {
@@ -202,6 +197,68 @@ static string XmlSec::encrypt(data input_data, string tmpl, XmlSecKey[XmlSecKey]
     return edoc.getString();
 }
 
+//! Encrypts data using an XML template and an @ref Qore::XmlSec::XmlSecKey "XmlSecKey" object and optionally an @ref Qore::XmlSec::XmlSecKeyManager "XmlSecKeyManager" object
+/** @par Example:
+    @code{.py}
+string xml = XmlSec::encrypt(str, encryption_template, key);
+    @endcode
+
+    @param bin_data the data to encrypt
+    @param tmpl the XML template for encrypting the data
+    @param key the key to use to encrypt the data
+    @param manager the optional key manager to use for encryption
+
+    @return the XML string with the encrypted data
+
+    Make sure the key type corresponds to the \c Algorithm attribute of the \c EncryptionMethod tag
+    in the XML template or the method call will fail.  If any errors occur an appropriate exception
+    is thrown.
+
+    @throw XMLSEC-ENCRYPT-ERROR error in arguments to the methods; encryption failed, libxmlsec error
+*/
+static string XmlSec::encrypt(binary bin_data, string tmpl, XmlSecKey[QoreXmlSecKey] key, *XmlSecKeyManager[QoreXmlSecKeyManager] key_manager) {
+    SimpleRefHolder<QoreXmlSecKey> holder(key);
+    SimpleRefHolder<QoreXmlSecKeyManager> mgr_holder(key_manager);
+
+    TempEncodingHelper template_utf8(tmpl, QCS_UTF8, xsink);
+    if (!template_utf8) {
+        return QoreValue();
+    }
+
+    QoreXmlDoc doc(template_utf8->getBuffer());
+    if (!doc || !doc.getRootElement()) {
+        xsink->raiseException("XMLSEC-ENCRYPT-ERROR", "unable to parse XML template string");
+        return QoreValue();
+    }
+
+    // find start node
+    xmlNodePtr node = xmlSecFindNode(doc.getRootElement(), xmlSecNodeEncryptedData, xmlSecEncNs);
+    if (!node) {
+        xsink->raiseException("XMLSEC-ENCRYPT-ERROR", "start node not found in template");
+        return QoreValue();
+    }
+
+    //printd(5, "mgr=%08p\n", mgr ? mgr->getKeyManager() : 0);
+    QoreXmlSecEncCtx encCtx(xsink, key_manager ? key_manager->getKeyManager() : nullptr);
+    if (!encCtx) {
+        xsink->raiseException("XMLSEC-ENCRYPT-ERROR", "failed to create encryption context");
+        return QoreValue();
+    }
+
+    xmlSecKeyPtr new_key = key->clone(xsink);
+    if (!new_key) {
+        return QoreValue();
+    }
+
+    encCtx.setKey(new_key);
+
+    if (encCtx.encryptBinary(node, bin_data)) {
+        xsink->raiseException("XMLSEC-ENCRYPT-ERROR", "encryption failed");
+        return QoreValue();
+    }
+    return doc.getString();
+}
+
 //! Decrypts the encrypted XML data in the XML string using the given key
 /** @par Example:
     @code{.py}
@@ -215,7 +272,7 @@ data d = XmlSec::decrypt(xml, key);
 
     @throw XMLSEC-DECRYPT-ERROR decryption failed, libxmlsec error
 */
-static data XmlSec::decrypt(string xml, XmlSecKey[XmlSecKey] key) [flags=RET_VALUE_ONLY] {
+static data XmlSec::decrypt(string xml, XmlSecKey[QoreXmlSecKey] key) [flags=RET_VALUE_ONLY] {
     SimpleRefHolder<QoreXmlSecKey> holder(key);
 
     TempEncodingHelper xml_utf8(xml, QCS_UTF8, xsink);
@@ -270,7 +327,7 @@ data d = XmlSec::decrypt(xml, key_manager);
 
     @throw XMLSEC-DECRYPT-ERROR decryption failed, libxmlsec error
 */
-static data XmlSec::decrypt(string xml, XmlSecKeyManager[XmlSecKeyManager] key_manager) [flags=RET_VALUE_ONLY] {
+static data XmlSec::decrypt(string xml, XmlSecKeyManager[QoreXmlSecKeyManager] key_manager) [flags=RET_VALUE_ONLY] {
     SimpleRefHolder<QoreXmlSecKeyManager> mgr_holder(key_manager);
 
     TempEncodingHelper xml_utf8(xml, QCS_UTF8, xsink);
@@ -322,10 +379,10 @@ string xml = XmlSec::sign(template_string, key);
     @throw XMLSEC-SIGN-ERROR error in arguments to the methods; libxmlsec error
     @throw XMLSEC-DSIGCTX-ERROR error producing the signed XML string
 */
-static string XmlSec::sign(string tmpl, XmlSecKey[XmlSecKey] key) [flags=RET_VALUE_ONLY] {
+static string XmlSec::sign(string tmpl, XmlSecKey[QoreXmlSecKey] key) [flags=RET_VALUE_ONLY] {
     SimpleRefHolder<QoreXmlSecKey> holder(key);
 
-    TempEncodingHelper template_utf8(templ, QCS_UTF8, xsink);
+    TempEncodingHelper template_utf8(tmpl, QCS_UTF8, xsink);
     if (!template_utf8) {
         return QoreValue();
     }
@@ -379,7 +436,7 @@ XmlSec::verify(signed_string, key);
     @throw XMLSEC-SIGN-ERROR: error in arguments to the methods; signature verification failed
     @throw XMLSEC-DSIGCTX-ERROR: signature verification could not be processed by libxmlse
 */
-static nothing XmlSec::verify(string signed_string, XmlSecKey[XmlSecKey] key) {
+static nothing XmlSec::verify(string signed_string, XmlSecKey[QoreXmlSecKey] key) {
     SimpleRefHolder<QoreXmlSecKey> holder(key);
 
     TempEncodingHelper str_utf8(signed_string, QCS_UTF8, xsink);

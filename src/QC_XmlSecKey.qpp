@@ -38,7 +38,7 @@ XmlSec key(key_pem, xmlSecKeyDataFormatPem, password);
     @endcode
 
     @param key the key in PEM or DER format
-    @param the format of the key (for possible values, see @ref XXX)
+    @param the format of the key (for possible values, see @ref xmlsec_keydataformat_constants for possible values)
     @param the optional password for the key
 
     Creates a new key based on key data (for example, in PEM or DER format), the second argument will normally be xmlSecKeyDataFormatPem or xmlSecKeyDataFormatDer.
@@ -50,11 +50,11 @@ XmlSecKey::constructor(data key, int format, *string password) {
     size_t len;
     q_get_data(key, ptr, len);
 
-    SimpleRefHolder<QoreXmlSecKey> key(new QoreXmlSecKey(xsink, (xmlSecByte*)ptr, len,
+    SimpleRefHolder<QoreXmlSecKey> newkey(new QoreXmlSecKey(xsink, (xmlSecByte*)ptr, len,
         (xmlSecKeyDataFormat)format, password ? password->c_str() : nullptr));
     if (*xsink)
         return;
-    self->setPrivate(CID_XMLSECKEY, key.release());
+    self->setPrivate(CID_XMLSECKEY, newkey.release());
 }
 
 //! Creates a new \c XmlSecKey based on the arguments passed.
@@ -126,13 +126,13 @@ XmlSecKey::copy() {
 key.setCertificate(cert_pem, xmlSecKeyDataFormatCertPem);
     @endcode
 
-    @param key the key in PEM or DER format
-    @param the format of the key (for possible values, see @ref XXX)
+    @param cert the certificate in PEM or DER format
+    @param the format of the key (for possible values, see @ref xmlsec_keydataformat_constants for possible values)
 */
-nothing XmlSecKey::setCertificate(data key, int format) {
+nothing XmlSecKey::setCertificate(data cert, int format) {
     const char* ptr;
     size_t len;
-    q_get_data(key, ptr, len);
+    q_get_data(cert, ptr, len);
 
     key->setCertificate((xmlSecByte*)ptr, len, (xmlSecKeyDataFormat)format, xsink);
 }
@@ -147,7 +147,7 @@ key.setCertificate(cert);
 */
 nothing XmlSecKey::setCertificate(SSLCertificate[QoreSSLCertificate] cert)) {
     ReferenceHolder<QoreSSLCertificate> holder(cert, xsink);
-    SimpleRefHolder<QoreStringNode> cert_pem(c->getPEM(xsink));
+    SimpleRefHolder<QoreStringNode> cert_pem(cert->getPEM(xsink));
     if (*xsink)
         return QoreValue();
 
@@ -163,7 +163,7 @@ key.setName(name);
     @throw XMLSECKEY-ERROR error reported by libxmlsec setting the name
 */
 nothing XmlSecKey::setName(string name) {
-    key->setName(str->c_str(), xsink);
+    key->setName(name->c_str(), xsink);
 }
 
 //! Returns the key name; if no key name is set, returns @ref nothing
@@ -178,7 +178,7 @@ string XmlSecKey::getName() [flags=RET_VALUE_ONLY] {
     return key->getName(xsink);
 }
 
-//! Returns the key's type as an integer value; see @ref XXX for possible values
+//! Returns the key's type as an integer value; see @ref xmlsec_keydatatype_constants for possible values
 /** @par Example:
     @code{.py}
 int type = key.getType());

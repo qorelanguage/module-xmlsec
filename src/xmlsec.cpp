@@ -22,6 +22,7 @@
 
 #include <qore/QoreSSLCertificate.h>
 
+#include "QC_XmlSec.h"
 #include "QC_XmlSecKey.h"
 #include "QC_XmlSecKeyManager.h"
 
@@ -68,7 +69,7 @@ DLLLOCAL QoreThreadLock big_lock;
 
 xmlSecKeyDataId xmlsec_get_keydata_id(int id) {
     key_data_map_t::const_iterator i = key_data_map.find(id);
-    return i != key_data_map.end() ? i.second : nullptr;
+    return i != key_data_map.end() ? i->second : nullptr;
 };
 
 // xmlsec library error callback function
@@ -121,22 +122,14 @@ QoreStringNode *xmlsec_module_init() {
     if (xmlSecCryptoInit() < 0)
         return new QoreStringNode("xmlsec-crypto initialization failed");
 
-    XmlSec_NS.addConstant("xmlSecKeyDataAesId",          new QoreXmlSecKeyDataIdNode(xmlSecKeyDataAesId));
-    XmlSec_NS.addConstant("xmlSecKeyDataDesId",          new QoreXmlSecKeyDataIdNode(xmlSecKeyDataDesId));
-    XmlSec_NS.addConstant("xmlSecKeyDataDsaId",          new QoreXmlSecKeyDataIdNode(xmlSecKeyDataDsaId));
-    XmlSec_NS.addConstant("xmlSecKeyDataHmacId",         new QoreXmlSecKeyDataIdNode(xmlSecKeyDataHmacId));
-    XmlSec_NS.addConstant("xmlSecKeyDataRsaId",          new QoreXmlSecKeyDataIdNode(xmlSecKeyDataRsaId));
-    XmlSec_NS.addConstant("xmlSecKeyDataX509Id",         new QoreXmlSecKeyDataIdNode(xmlSecKeyDataX509Id));
-    XmlSec_NS.addConstant("xmlSecKeyDataRawX509CertId",  new QoreXmlSecKeyDataIdNode(xmlSecKeyDataRawX509CertId));
-
     // set error callback function
     xmlSecErrorsSetCallback(qore_xmlSecErrorsCallback);
 
     // setup XmlSec namespace
     // add classes
-    XmlSec_NS.addSystemClass(initXmlSecClass());
-    XmlSec_NS.addSystemClass(initXmlSecKeyClass());
-    XmlSec_NS.addSystemClass(initXmlSecKeyManagerClass());
+    XmlSec_NS.addSystemClass(initXmlSecClass(XmlSec_NS));
+    XmlSec_NS.addSystemClass(initXmlSecKeyClass(XmlSec_NS));
+    XmlSec_NS.addSystemClass(initXmlSecKeyManagerClass(XmlSec_NS));
 
     return 0;
 }

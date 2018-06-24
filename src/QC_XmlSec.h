@@ -27,6 +27,6 @@
 DLLLOCAL extern qore_classid_t CID_XMLSEC;
 DLLLOCAL extern QoreClass* QC_XMLSEC;
 
-DLLLOCAL QoreClass* initXmlSecClass();
+DLLLOCAL QoreClass* initXmlSecClass(QoreNamespace& ns);
 
 #endif

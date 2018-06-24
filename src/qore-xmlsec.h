@@ -1,5 +1,5 @@
 
-#include <config.h>
+//#include <config.h>
 
 #include <qore/Qore.h>
 
@@ -30,6 +30,3 @@
 #define XMLSEC_KEYDATA_RAWX509CERTID 7
 
 extern xmlSecKeyDataId xmlsec_get_keydata_id(int i);
-
-#include "QoreXmlSecKeyDataIdNode.h"
-#include "QoreXmlSecKeyDataFormatNode.h"
