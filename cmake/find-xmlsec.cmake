@@ -1,10 +1,3 @@
-# - Try to find CZMQ
-# Once done this will define
-# CZMQ_FOUND - System has CZMQ
-# CZMQ_INCLUDE_DIRS - The CZMQ include directories
-# CZMQ_LIBRARIES - The libraries needed to use CZMQ
-# CZMQ_DEFINITIONS - Compiler switches required for using CZMQ
-
 include(CheckFunctionExists)
 
 find_path(XMLSEC_INCLUDE_DIR xmlsec.h

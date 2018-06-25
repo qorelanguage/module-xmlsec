@@ -10,13 +10,12 @@ set(PROJECT_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 
 find_package(Qore 0.9 REQUIRED)
 find_package(LibXml2 REQUIRED)
-find_package(libxslt REQUIRED)
 find_package(OpenSSL REQUIRED)
 
 include("${CMAKE_SOURCE_DIR}/cmake/find-xmlsec.cmake")
+include("${CMAKE_SOURCE_DIR}/cmake/find-libxslt.cmake")
 
 list(APPEND CMAKE_REQUIRED_LIBRARIES ${LIBXML2_LIBRARIES})
-list(APPEND CMAKE_REQUIRED_LIBRARIES ${LIBXSLT_LIBRARIES})
 list(APPEND CMAKE_REQUIRED_LIBRARIES ${OPENSSL_SSL_LIBRARY})
 
 list(APPEND CMAKE_REQUIRED_INCLUDES ${LIBXML2_INCLUDE_DIR})
@@ -24,6 +23,7 @@ list(APPEND CMAKE_REQUIRED_INCLUDES ${OPENSSL_INCLUDE_DIR})
 
 include_directories(${CMAKE_SOURCE_DIR}/src)
 include_directories(${LIBXML2_INCLUDE_DIR})
+include_directories(${LIBXSLT_INCLUDE_DIR})
 include_directories(${OPENSSL_INCLUDE_DIR})
 include_directories(${QORE_INCLUDE_DIR})
 
@@ -66,7 +66,7 @@ set(QORE_DOX_TMPL_SRC
 
 add_library(${module_name} SHARED ${QPP_SOURCES} ${CPP_SRC})
 
-qore_binary_module(${module_name} ${PROJECT_VERSION} ${XMLSEC_LIBRARY} "${LIBXML2_LIBRARIES}" "${LIBXSLT_LIBRARIES}" "${OPENSSL_SSL_LIBRARY}")
+qore_binary_module(${module_name} ${PROJECT_VERSION} "${XMLSEC_LIBRARY}" "${LIBXML2_LIBRARIES}" "${LIBXSLT_LIBRARY}" "${OPENSSL_SSL_LIBRARY}")
 #qore_user_modules("${QMOD}")
 install(PROGRAMS ${SCRIPTS} DESTINATION bin)
 
