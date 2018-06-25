@@ -1,8 +1,8 @@
 include(CheckFunctionExists)
 
-find_path(XMLSEC_INCLUDE_DIR xmlsec.h
+find_path(XMLSEC_INCLUDE_DIR xmlsec/xmlsec.h
     HINTS $ENV{XMLSEC_DIR}/include
-    PATH_SUFFIXES xmlsec1/xmlsec
+    PATH_SUFFIXES xmlsec1
 )
 
 #message(STATUS "XMLSEC_INCLUDE_DIR: ${XMLSEC_INCLUDE_DIR} hint: $ENV{XMLSEC_DIR}/include")

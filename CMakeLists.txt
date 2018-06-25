@@ -41,7 +41,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DXMLSEC_CRYPTO=\\\"openssl\\\" -DXMLSEC
 set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
 
 include_directories(${XMLSEC_INCLUDE_DIR})
-include_directories(${XMLSEC_INCLUDE_DIR}/..)
 
 set(QPP_SRC
     src/QC_XmlSec.qpp

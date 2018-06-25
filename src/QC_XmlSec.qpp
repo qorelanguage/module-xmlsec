@@ -22,8 +22,6 @@
 
 #include "qore-xmlsec.h"
 
-#include <openssl/ssl.h>
-
 #include <qore/QoreSSLCertificate.h>
 
 #include "QC_XmlSec.h"
