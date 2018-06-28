@@ -1,15 +1,31 @@
-# TODO: Add defines for solaris and hp-ux.
-# TODO: Maybe not depend on cmake 3 but the project command is nice in cmake 3.
+cmake_minimum_required(VERSION 2.8.3)
 
-cmake_minimum_required(VERSION 3.0.0)
+project(qore-xmlsec-module)
 
-project(qore-xmlsec-module VERSION 0.0.3)
+set (VERSION_MAJOR 0)
+set (VERSION_MINOR 0)
+set (VERSION_PATCH 4)
 
-option(INSTALL_DOCS "Install documentation" OFF)
+set(PROJECT_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 
-include(CheckCXXCompilerFlag)
+find_package(Qore 0.9 REQUIRED)
+find_package(LibXml2 REQUIRED)
+find_package(OpenSSL REQUIRED)
 
-find_package(Qore 0.7.1 REQUIRED)
+include("${CMAKE_SOURCE_DIR}/cmake/find-xmlsec.cmake")
+include("${CMAKE_SOURCE_DIR}/cmake/find-libxslt.cmake")
+
+list(APPEND CMAKE_REQUIRED_LIBRARIES ${LIBXML2_LIBRARIES})
+list(APPEND CMAKE_REQUIRED_LIBRARIES ${OPENSSL_SSL_LIBRARY})
+
+list(APPEND CMAKE_REQUIRED_INCLUDES ${LIBXML2_INCLUDE_DIR})
+list(APPEND CMAKE_REQUIRED_INCLUDES ${OPENSSL_INCLUDE_DIR})
+
+include_directories(${CMAKE_SOURCE_DIR}/src)
+include_directories(${LIBXML2_INCLUDE_DIR})
+include_directories(${LIBXSLT_INCLUDE_DIR})
+include_directories(${OPENSSL_INCLUDE_DIR})
+include_directories(${QORE_INCLUDE_DIR})
 
 # Check for C++11.
 include(CheckCXXCompilerFlag)
@@ -20,49 +36,48 @@ else()
     message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
 endif()
 
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(XMLSEC1 REQUIRED xmlsec1>=1.0.0)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DXMLSEC_CRYPTO=\\\"openssl\\\" -DXMLSEC_CRYPTO_DYNAMIC_LOADING=1 -D__XMLSEC_FUNCTION__=__FUNCTION__ -DXMLSEC_NO_SIZE_T -DXMLSEC_NO_XKMS=1")
 
-set(CMAKE_THREAD_PREFER_PTHREAD ON)
-set(THREADS_PREFER_PTHREAD_FLAG ON)
-find_package(Threads REQUIRED)
-if(CMAKE_USE_PTHREADS_INIT)
-message(STATUS "Found POSIX Threads: TRUE")
-else(CMAKE_USE_PTHREADS_INIT)
-message(STATUS "Found POSIX Threads: FALSE")
-message(FATAL_ERROR "POSIX threads does not seem to be supported on this platform, aborting")
-endif()
+set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
 
-check_cxx_compiler_flag(-fvisibility=hidden HAVE_GCC_VISIBILITY)
+include_directories(${XMLSEC_INCLUDE_DIR})
 
-if(${CMAKE_SYSTEM_NAME} EQUAL "Linux")
-add_definitions(-D_GNU_SOURCE)
-elif(${CMAKE_SYSTEM_NAME} EQUAL "Darwin")
-add_definitions(-DDARWIN)
-endif()
-
-configure_file(${CMAKE_SOURCE_DIR}/cmake/config.h.cmake 
-               ${CMAKE_BINARY_DIR}/config.h)
-
-set(CPP_SRC
-    src/QC_XmlSecKey.cc
-    src/QC_XmlSecKeyManager.cc
-    src/xmlsec.cc
+set(QPP_SRC
+    src/QC_XmlSec.qpp
+    src/QC_XmlSecKey.qpp
+    src/QC_XmlSecKeyManager.qpp
 )
 
-set(module_name "xmlsec")
+set(CPP_SRC
+    src/xmlsec.cpp
+)
 
-add_library(${module_name} SHARED ${CPP_SRC})
-target_compile_options(${module_name} PUBLIC ${XMLSEC1_CFLAGS})
+set(QMOD
+)
 
-qore_binary_module(${module_name} ${PROJECT_VERSION} ${XMLSEC1_LDFLAGS} Threads::Threads)
+qore_wrap_qpp_value(QPP_SOURCES ${QPP_SRC})
+
+SET (module_name "xmlsec")
+
+set(QORE_DOX_TMPL_SRC
+  docs/mainpage.dox.tmpl
+)
+
+add_library(${module_name} SHARED ${QPP_SOURCES} ${CPP_SRC})
+
+qore_binary_module(${module_name} ${PROJECT_VERSION} "${XMLSEC_LIBRARY}" "${LIBXML2_LIBRARIES}" "${LIBXSLT_LIBRARY}" "${OPENSSL_SSL_LIBRARY}")
+#qore_user_modules("${QMOD}")
+install(PROGRAMS ${SCRIPTS} DESTINATION bin)
 
 qore_dist(${PROJECT_VERSION})
 
 qore_config_info()
 
-if(INSTALL_DOCS)
-include(GNUInstallDirs)
-install(FILES ${CMAKE_SOURCE_DIR}/docs/xmlsec-module-doc.html
-        DESTINATION ${CMAKE_INSTALL_FULL_DOCDIR}/html)
+FIND_PACKAGE(Doxygen)
+if (DOXYGEN_FOUND)
+  qore_wrap_dox(QORE_DOX_SRC ${QORE_DOX_TMPL_SRC})
+  add_custom_target(QORE_MOD_DOX_FILES DEPENDS ${QORE_DOX_SRC})
+  add_dependencies(docs QORE_MOD_DOX_FILES)
 endif()
+
+
