@@ -10,7 +10,9 @@ find_path(XMLSEC_INCLUDE_DIR xmlsec/xmlsec.h
 check_function_exists(xmlSecFindNode HAVE_XMLSEC)
 if (NOT HAVE_XMLSEC)
     message(STATUS "-- Looking for xmlsec")
-    find_library(XMLSEC_LIBRARY NAMES xmlsec1 xmlsec)
+    find_library(XMLSEC_LIBRARY NAMES xmlsec1 xmlsec
+      HINTS $ENV{XMLSEC_DIR}/lib64
+    )
     if (XMLSEC_INCLUDE_DIR AND XMLSEC_LIBRARY)
         message(STATUS "-- Found xmlsec: ${XMLSEC_LIBRARY}")
         set(HAVE_XMLSEC true)
