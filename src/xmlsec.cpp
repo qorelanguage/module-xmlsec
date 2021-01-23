@@ -77,6 +77,9 @@ static void qore_xmlSecErrorsCallback(const char *file, int line, const char *fu
    //printd(5, "xmlsec error: %s: %s: %s\n", errorObject, errorSubject, msg);
 }
 
+DLLLOCAL void preinitXmlSecKeyClass();
+DLLLOCAL void preinitXmlSecKeyManagerClass();
+
 QoreStringNode *xmlsec_module_init() {
     xmlLoadExtDtdDefaultValue = XML_DETECT_IDS | XML_COMPLETE_ATTRS;
     xmlSubstituteEntitiesDefault(1);
@@ -127,6 +130,8 @@ QoreStringNode *xmlsec_module_init() {
 
     // setup XmlSec namespace
     // add classes
+    preinitXmlSecKeyClass();
+    preinitXmlSecKeyManagerClass();
     XmlSec_NS.addSystemClass(initXmlSecClass(XmlSec_NS));
     XmlSec_NS.addSystemClass(initXmlSecKeyClass(XmlSec_NS));
     XmlSec_NS.addSystemClass(initXmlSecKeyManagerClass(XmlSec_NS));
