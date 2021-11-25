@@ -3,7 +3,7 @@
 
     Qore Programming Language
 
-    Copyright 2003 - 2018 Qore Technologies, s.r.o.
+    Copyright 2003 - 2021 Qore Technologies, s.r.o.
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -30,26 +30,9 @@ DLLLOCAL extern QoreClass* QC_XMLSECKEY;
 DLLLOCAL QoreClass* initXmlSecKeyClass(QoreNamespace& ns);
 
 class QoreXmlSecKey : public AbstractPrivateData, public QoreThreadLock {
-private:
-    xmlSecKeyPtr key;
-
-    // not implemented
-    DLLLOCAL QoreXmlSecKey(const QoreXmlSecKey &k);
-
-    DLLLOCAL QoreXmlSecKey(xmlSecKeyPtr k) : key(k) {}
-
-    DLLLOCAL bool isValidIntern() { return xmlSecKeyIsValid(key); }
-
-    DLLLOCAL int checkValidIntern(ExceptionSink *xsink) {
-        if (!isValidIntern()) {
-        xsink->raiseException("XMLSECKEY-ERROR", "key is not valid");
-        return -1;
-        }
-        return 0;
-    }
-
 public:
-    DLLLOCAL QoreXmlSecKey(ExceptionSink *xsink, xmlSecByte *ptr, int len, xmlSecKeyDataFormat format, const char *password = 0) {
+    DLLLOCAL QoreXmlSecKey(ExceptionSink* xsink, xmlSecByte* ptr, int len, xmlSecKeyDataFormat format,
+            const char* password = nullptr) {
         key = xmlSecCryptoAppKeyLoadMemory(ptr, len, format, password, 0, 0);
         if (!key) {
             xsink->raiseException("XMLSECKEY-ERROR", "key creation from memory buffer failed");
@@ -57,7 +40,8 @@ public:
         }
     }
 
-    DLLLOCAL QoreXmlSecKey(const xmlChar *name, xmlSecSize sizeBits, xmlSecKeyDataType type, ExceptionSink *xsink) {
+    DLLLOCAL QoreXmlSecKey(const xmlChar* name, xmlSecSize sizeBits, xmlSecKeyDataType type,
+            ExceptionSink* xsink) {
         key = xmlSecKeyGenerateByName(name, sizeBits, type);
         if (!key) {
             xsink->raiseException("XMLSECKEY-ERROR", "key generation failed");
@@ -65,7 +49,8 @@ public:
         }
     }
 
-    DLLLOCAL QoreXmlSecKey(xmlSecKeyDataId dataId, xmlSecSize sizeBits, xmlSecKeyDataType type, ExceptionSink *xsink) {
+    DLLLOCAL QoreXmlSecKey(xmlSecKeyDataId dataId, xmlSecSize sizeBits, xmlSecKeyDataType type,
+            ExceptionSink* xsink) {
         key = xmlSecKeyGenerate(dataId, sizeBits, type);
         if (!key) {
             xsink->raiseException("XMLSECKEY-ERROR", "key generation failed");
@@ -74,24 +59,25 @@ public:
     }
 
     DLLLOCAL ~QoreXmlSecKey() {
-        if (key)
+        if (key) {
             xmlSecKeyDestroy(key);
+        }
     }
 
-    DLLLOCAL xmlSecKeyPtr clone(ExceptionSink *xsink) {
+    DLLLOCAL xmlSecKeyPtr clone(ExceptionSink* xsink) {
         xmlSecKeyPtr k = xmlSecKeyDuplicate(key);
         if (!k) {
             xsink->raiseException("XMLSECKEY-ERROR", "failed to copy key");
-            return 0;
+            return nullptr;
         }
         return k;
     }
 
-    DLLLOCAL QoreXmlSecKey *copy(ExceptionSink *xsink) {
+    DLLLOCAL QoreXmlSecKey* copy(ExceptionSink* xsink) {
         xmlSecKeyPtr k = xmlSecKeyDuplicate(key);
         if (!k) {
             xsink->raiseException("XMLSECKEY-ERROR", "failed to copy key");
-            return 0;
+            return nullptr;
         }
         return new QoreXmlSecKey(k);
     }
@@ -100,7 +86,7 @@ public:
         return (bool)key;
     }
 
-    DLLLOCAL int setCertificate(xmlSecByte *ptr, int len, xmlSecKeyDataFormat format, ExceptionSink *xsink) {
+    DLLLOCAL int setCertificate(xmlSecByte *ptr, int len, xmlSecKeyDataFormat format, ExceptionSink* xsink) {
         AutoLocker al(this);
         if (checkValidIntern(xsink))
             return -1;
@@ -112,7 +98,7 @@ public:
         return 0;
     }
 
-    DLLLOCAL int setName(const char *name, ExceptionSink *xsink) {
+    DLLLOCAL int setName(const char *name, ExceptionSink* xsink) {
         AutoLocker al(this);
         if (checkValidIntern(xsink))
             return -1;
@@ -125,36 +111,54 @@ public:
         return 0;
     }
 
-    DLLLOCAL QoreStringNode *getName(ExceptionSink *xsink) {
+    DLLLOCAL QoreStringNode* getName(ExceptionSink* xsink) {
         AutoLocker al(this);
-        if (checkValidIntern(xsink))
-            return 0;
+        if (checkValidIntern(xsink)) {
+            return nullptr;
+        }
 
-        const xmlChar *name = xmlSecKeyGetName(key);
-        return name ? new QoreStringNode(name) : 0;
+        const xmlChar* name = xmlSecKeyGetName(key);
+        return name ? new QoreStringNode(name) : nullptr;
     }
 
-    DLLLOCAL xmlSecKeyDataType getType(ExceptionSink *xsink) {
+    DLLLOCAL xmlSecKeyDataType getType(ExceptionSink* xsink) {
         AutoLocker al(this);
-        if (checkValidIntern(xsink))
+        if (checkValidIntern(xsink)) {
             return xmlSecKeyDataTypeUnknown;
+        }
 
         return xmlSecKeyGetType(key);
     }
 
-/*
-    DLLLOCAL int getSize(ExceptionSink *xsink) {
+    DLLLOCAL int64 getSize(ExceptionSink* xsink) {
         AutoLocker al(this);
         if (checkValidIntern(xsink))
-        return -1;
+            return -1;
 
-        return xmlSecKeyDataGetSize(key);
+        return xmlSecKeyDataGetSize(xmlSecKeyGetValue(key));
     }
-*/
 
     DLLLOCAL bool isValid() {
         AutoLocker al(this);
         return isValidIntern();
+    }
+
+private:
+    xmlSecKeyPtr key;
+
+    // not implemented
+    QoreXmlSecKey(const QoreXmlSecKey& k) = delete;
+
+    DLLLOCAL QoreXmlSecKey(xmlSecKeyPtr k) : key(k) {}
+
+    DLLLOCAL bool isValidIntern() { return xmlSecKeyIsValid(key); }
+
+    DLLLOCAL int checkValidIntern(ExceptionSink* xsink) {
+        if (!isValidIntern()) {
+            xsink->raiseException("XMLSECKEY-ERROR", "key is not valid");
+            return -1;
+        }
+        return 0;
     }
 };
 

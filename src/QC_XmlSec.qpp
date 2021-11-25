@@ -3,7 +3,7 @@
 
     Qore Programming Language
 
-    Copyright 2003 - 2018 Qore Technologies, s.r.o.
+    Copyright 2003 - 2021 Qore Technologies, s.r.o.
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -480,8 +480,7 @@ static nothing XmlSec::verify(string signed_string, XmlSecKey[QoreXmlSecKey] key
     // check if signatures do not match
     if (dsigCtx.getTransformStatus() == xmlSecTransformStatusFail) {
         xsink->raiseException("XMLSEC-VERIFY-ERROR", "signature verification failed; signatures do not match");
-    }
-    else if (dsigCtx.getStatus() != xmlSecDSigStatusSucceeded) {
+    } else if (dsigCtx.getStatus() != xmlSecDSigStatusSucceeded) {
         xsink->raiseException("XMLSEC-VERIFY-ERROR", "signature verification failed; crypto error");
     }
 }

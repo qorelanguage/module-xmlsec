@@ -3,7 +3,7 @@
 
     Qore Programming Language
 
-    Copyright 2003 - 2018 Qore Technologies, s.r.o.
+    Copyright 2003 - 2021 Qore Technologies, s.r.o.
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -188,4 +188,18 @@ int type = key.getType());
 */
 int XmlSecKey::getType() [flags=RET_VALUE_ONLY] {
     return (int64)key->getType(xsink);
+}
+
+//! Returns the key's bit size as an integer
+/** @par Example:
+    @code{.py}
+int size = key.getSize());
+    @endcode
+
+    @return the key's bit size as an integer
+
+    @throw XMLSECKEY-ERROR error reported by libxmlsec reading the key
+*/
+int XmlSecKey::getSize() [flags=RET_VALUE_ONLY] {
+    return key->getSize(xsink);
 }

@@ -3,7 +3,7 @@
 
     Qore Programming Language
 
-    Copyright 2003 - 2018 Qore Technologies, s.r.o.
+    Copyright 2003 - 2021 Qore Technologies, s.r.o.
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -25,16 +25,16 @@
 #define _QORE_XMLSECKEYMANAGER_H
 
 DLLLOCAL extern qore_classid_t CID_XMLSECKEYMANAGER;
-DLLLOCAL extern QoreClass *QC_XMLSECKEYMANAGER;
+DLLLOCAL extern QoreClass* QC_XMLSECKEYMANAGER;
 
-DLLLOCAL QoreClass *initXmlSecKeyManagerClass(QoreNamespace& ns);
+DLLLOCAL QoreClass* initXmlSecKeyManagerClass(QoreNamespace& ns);
 
 class QoreXmlSecKeyManager : public AbstractPrivateData, public QoreThreadLock {
 private:
     xmlSecKeysMngrPtr keyMgr;
 
 public:
-    DLLLOCAL QoreXmlSecKeyManager(ExceptionSink *xsink) : keyMgr(xmlSecKeysMngrCreate()) {
+    DLLLOCAL QoreXmlSecKeyManager(ExceptionSink* xsink) : keyMgr(xmlSecKeysMngrCreate()) {
         if (!keyMgr) {
             xsink->raiseException("XMLSECKEYMANAGER-ERROR", "failed to create key manager");
             return;
@@ -54,7 +54,7 @@ public:
     }
 
     // takes ownership of key - deletes key if operation fails
-    DLLLOCAL int adoptKey(xmlSecKeyPtr key, ExceptionSink *xsink) {
+    DLLLOCAL int adoptKey(xmlSecKeyPtr key, ExceptionSink* xsink) {
         AutoLocker al(this);
 
         if (xmlSecCryptoAppDefaultKeysMngrAdoptKey(keyMgr, key)) {
