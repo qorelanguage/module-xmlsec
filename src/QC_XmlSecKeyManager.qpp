@@ -82,13 +82,13 @@ XmlSecKeyManager::addKey(XmlSecKey[QoreXmlSecKey] key) {
     }
 }
 
-//! adds certificate to the \c XmlSecKeyManager object and marks it as trusted
+//! adds certificate to the \c XmlSecKeyManager object and marks it according tot the arguments
 /** @par Example:
     @code{.py}
-mgr.loadCertFromPath(path, );
+mgr.loadCertFromPath(path, xmlSecKeyDataFormatCertPem, xmlSecKeyDataTypeTrusted);
     @endcode
 
-    @param key the key to add
+    @param path the path to the certificate on the filesystem
     @param format the format of the file data (for possible values, see @ref xmlsec_keydataformat_constants for
     possible values)
     @param type the certificate type; see @ref xmlsec_keydatatype_constants for possible values
@@ -96,8 +96,30 @@ mgr.loadCertFromPath(path, );
     @throw XMLSECKEYMANAGER-ERROR error reported by libxmlsec loading the certificate or assigning the certificate to
     the key manager
 */
-XmlSecKeyManager::loadCertFromPath(string path, int format, int type) {
+XmlSecKeyManager::loadCertFromPath(string path, int format, int type) [dom=FILESYSTEM] {
     mgr->loadCertFromPath(xsink, path->c_str(), (xmlSecKeyDataFormat)format, (xmlSecKeyDataType)type);
+}
+
+//! adds certificate to the \c XmlSecKeyManager object and marks it according tot the arguments
+/** @par Example:
+    @code{.py}
+mgr.loadCertFromMemory(cert_data, xmlSecKeyDataFormatCertPem, xmlSecKeyDataTypeTrusted);
+    @endcode
+
+    @param cert_data the certificate data
+    @param format the format of the file data (for possible values, see @ref xmlsec_keydataformat_constants for
+    possible values)
+    @param type the certificate type; see @ref xmlsec_keydatatype_constants for possible values
+
+    @throw XMLSECKEYMANAGER-ERROR error reported by libxmlsec loading the certificate or assigning the certificate to
+    the key manager
+*/
+XmlSecKeyManager::loadCertFromMemory(data cert_data, int format, int type) {
+    const char* bin_ptr;
+    size_t bin_len;
+    q_get_data(cert_data, bin_ptr, bin_len);
+    mgr->loadCertFromMemory(xsink, (const xmlSecByte*)bin_ptr, (xmlSecSize)bin_len, (xmlSecKeyDataFormat)format,
+        (xmlSecKeyDataType)type);
 }
 
 //! Verifies the signature of the signed XML string passed

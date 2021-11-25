@@ -66,13 +66,27 @@ public:
         return 0;
     }
 
-    //! loads a certificate from a file and marks it as a trusted certificate
+    //! loads a certificate from a file and marks it according to the arguments
     DLLLOCAL int loadCertFromPath(ExceptionSink* xsink, const char* filename, xmlSecKeyDataFormat format,
             xmlSecKeyDataType type) {
         AutoLocker al(this);
 
         if (xmlSecCryptoAppKeysMngrCertLoad(keyMgr, filename, format, type)) {
             xsink->raiseException("XMLSECKEYMANAGER-ERROR", "failed to import certificate from path '%s'", filename);
+            return -1;
+        }
+
+        return 0;
+    }
+
+    //! loads a certificate from memory and marks it according to the arguments
+    DLLLOCAL int loadCertFromMemory(ExceptionSink* xsink, const xmlSecByte* data, xmlSecSize dataSize,
+            xmlSecKeyDataFormat format, xmlSecKeyDataType type) {
+        AutoLocker al(this);
+
+        if (xmlSecCryptoAppKeysMngrCertLoadMemory(keyMgr, data, dataSize, format, type)) {
+            xsink->raiseException("XMLSECKEYMANAGER-ERROR", "failed to import certificate from data of size %d",
+                (int)dataSize);
             return -1;
         }
 
