@@ -34,7 +34,7 @@
 
 Summary: XML Security Module for Qore
 Name: qore-xmlsec-module
-Version: 0.0.3
+Version: 1.0.0
 Release: 1%{dist}
 License: LGPL
 Group: Development/Languages
@@ -50,6 +50,11 @@ Requires: xmlsec1
 Requires: xmlsec1-openssl
 BuildRequires: xmlsec1-devel
 BuildRequires: qore
+%if 0%{?suse_version}
+BuildRequires: pkg-config
+%else
+BuildRequires: pkgconfig
+%endif
 
 %description
 This module provides classes and functions supporting the xmlenc and xmldsig
@@ -82,5 +87,10 @@ rm -rf $RPM_BUILD_ROOT
 %doc COPYING README RELEASE-NOTES ChangeLog AUTHORS docs/xmlsec-module-doc.html
 
 %changelog
+* Thu Nov 25 2011 David Nichols <david@qore.org> 1.0.0
+- updated to version 1.0.0
+- fixed build with newer libxmlsec1 builds
+- fixed tests
+
 * Tue Sep 2 2008 David Nichols <david_nichols@users.sourceforge.net>
 - initial spec file for separate xmlsec release

@@ -1,0 +1,236 @@
+#!/usr/bin/env qore
+
+# requires the xmlsec module
+%requires xmlsec
+
+# requires the xml module
+%requires xml
+
+# requires QUnit
+%requires QUnit
+
+# execute the XmlSecTest class as the application class
+%exec-class XmlSecTest
+
+# require all variables to be declared before use
+%require-our
+
+# enable all warnings
+%enable-all-warnings
+
+%new-style
+
+# option defaults
+const Defaults = {
+    "password"     : "password",                                   # password to private key
+    "certificate"  : get_script_dir() + DirSep + "test-cert.pem",  # test certificate name
+    "cert_key_file": get_script_dir() + DirSep + "test-key.pem",   # test private key name
+    "format"       : True,                                         # if XML strings should be formatted
+    "iters"        : 1,                                            # test loop iterations per thread
+    "threads"      : 1                                             # number of concurrent threads
+};
+
+# to create XML encryption template
+const EncHash = (
+    "e:TestEncryptedMessage": (
+        "^attributes^": ( "xmlns:e": "http://test.local/just_testing" ),
+        "EncryptedData": (
+            "^attributes^": (
+                "xmlns": "http://www.w3.org/2001/04/xmlenc#",
+                "Type": "http://www.w3.org/2001/04/xmlenc#Element",
+            ),
+            "EncryptionMethod": (
+                "^attributes^": ( "Algorithm": "http://www.w3.org/2001/04/xmlenc#aes256-cbc") ),
+            "KeyInfo": (
+                "^attributes^": ( "xmlns": "http://www.w3.org/2000/09/xmldsig#" ),
+                "EncryptedKey": ( "^attributes^": ( "xmlns": "http://www.w3.org/2001/04/xmlenc#" ),
+                "EncryptionMethod": (
+                    "^attributes^": ( "Algorithm": "http://www.w3.org/2001/04/xmlenc#rsa-1_5") ),
+                    "KeyInfo": (
+                        "^attributes^": ( "xmlns": "http://www.w3.org/2000/09/xmldsig#" ),
+                        "X509Data": NOTHING,
+                    ),
+                    "CipherData": ( "CipherValue": NOTHING ),
+                ),
+            ),
+            "CipherData": ( "CipherValue": NOTHING ),
+        ),
+    ),
+);
+
+class XmlSecTest inherits Test {
+    public {
+        int errors = 0;
+        int ip = 0;
+        string enc_tmpl;
+        Counter counter();
+
+        XmlSecKey session_key;
+        XmlSecKey cert_key;
+        XmlSecKeyManager mgr;
+
+        const MyOpts = Opts + {
+            "iters"   : "i,iters=i",
+            "format"  : "f,format",
+            "threads" : "t,threads=i",
+            "showmsgs": "S,show-messages",
+        };
+
+        # option column
+        const OptionColumn = 27;
+    }
+
+    constructor() : Test("XmlSecTest", "1.0", \ARGV, MyOpts) {
+        addTestCase("xmlsec", \run_tests());
+
+        set_return_value(main());
+
+        if (m_options.iters > 1 || m_options.threads > 1) {
+            printf("%d error%s encountered in %d iteration%s (%d thread%s).\n",
+                errors, errors == 1 ? "": "s",
+                ip, ip == 1 ? "": "s",
+                m_options.threads, m_options.threads == 1 ? "": "s");
+        }
+    }
+
+    run_tests(*bool bg) {
+        on_error ++errors;
+        on_exit if (bg) {
+            counter.dec();
+        }
+
+        if (!bg) {
+            int t = m_options.threads ?? 1;
+            while (--t) {
+                counter.inc();
+                background run_tests(True);
+            }
+        }
+
+        string str;
+
+        for (int i = 0; i < m_options.iters; ++i) {
+            assertEq(256, session_key.getSize());
+            string template = get_signature_template("1.0", "hello there, testing");
+
+            # sign the string with the certificate's private key
+            str = XmlSec::sign(template, cert_key);
+            if (m_options.showmsgs) {
+                printf("signed message:\n%s\n", str);
+            }
+
+            assertEq(Type::String, str.type());
+
+            # verify the signature
+            assertNothing(XmlSec::verify(str, cert_key));
+
+            # encrypt the signed message with a session key using the private key and certificate
+            string estr = XmlSec::encrypt(str, enc_tmpl, session_key, mgr);
+            if (m_options.showmsgs) {
+                printf("encrypted message:\n%s\n", estr);
+            }
+
+            assertEq(Type::String, estr.type());
+
+            # decrypt the message and compare to the original
+            string dstr = XmlSec::decrypt(estr, mgr);
+            assertEq(str, dstr);
+
+            ip += 1;
+        }
+
+        if (!bg) {
+            counter.waitForZero();
+        }
+    }
+
+    private globalSetUp() {
+        map m_options{$1.key} = $1.value, Defaults.pairIterator(), !exists m_options{$1.key};
+
+        # set up encoding template XML string (EncHash defined below)
+        enc_tmpl = m_options.format ? make_xml(EncHash, XGF_ADD_FORMATTING): make_xml(EncHash);
+
+        # create session key
+        session_key = new XmlSecKey(xmlSecKeyDataAesId, 256, xmlSecKeyDataTypeSession);
+
+        # set up encryption key for certificate
+        cert_key = new XmlSecKey(File::readTextFile(m_options.cert_key_file), xmlSecKeyDataFormatPem,
+            m_options.password);
+        cert_key.setCertificate(File::readTextFile(m_options.certificate), xmlSecKeyDataFormatCertPem);
+
+        # set up key manager
+        mgr = new XmlSecKeyManager();
+        mgr.addKey(cert_key);
+
+        if (m_options.verbose) {
+            printf("QORE xmlsec module v%s Test Script (%d thread%s, %d iteration%s per thread)\n",
+                XmlSec::ModuleVersion,
+                m_options.threads, m_options.threads == 1 ? "": "s",
+                m_options.iters, m_options.iters == 1 ? "": "s");
+        }
+    }
+
+    # returns the signature template XML string created from some example parameters
+    string get_signature_template(ver, body) {
+        # this template uses several transformations including an XPath specification
+        # to sign the e:Body and e:SenderDetails parts of the tree
+        hash<auto> h = (
+            "e:TestSignedMessage": {
+                "^attributes^": {"xmlns:e": "http://test.local/just_testing"},
+                "e:SenderDetails": (
+                    "e:TestEnvelopeVersion": ver,
+                    "e:Sender": (
+                        "e:URI": "http://test.local/test",
+                        "e:Authentication": (
+                            "Signature": (
+                                "^attributes^": ( "xmlns": "http://www.w3.org/2000/09/xmldsig#" ),
+                                "SignedInfo": (
+                                    "CanonicalizationMethod": (
+                                        "^attributes^": ( "Algorithm": "http://www.w3.org/TR/2001/REC-xml-c14n-20010315" ),
+                                    ),
+                                    "SignatureMethod": (
+                                        "^attributes^": ( "Algorithm": "http://www.w3.org/2000/09/xmldsig#rsa-sha1" ),
+                                    ),
+                                    "Reference": (
+                                        "^attributes^": ( "URI": NOTHING ),
+                                        "Transforms": (
+                                            "Transform": (
+                                                ( "^attributes^": ( "Algorithm": "http://www.w3.org/2000/09/xmldsig#enveloped-signature" ) ),
+                                                (
+                                                    "^attributes^": ( "Algorithm": "http://www.w3.org/TR/1999/REC-xpath-19991116" ),
+                                                    "XPath": (
+                                                        "^attributes^": ( "xmlns:e": "http://test.local/just_testing" ),
+                                                        "^value^": "ancestor-or-self::e:Body|ancestor-or-self::e:SenderDetails",
+                                                    ),
+                                                ),
+                                                ( "^attributes^": ( "Algorithm": "http://www.w3.org/TR/2001/REC-xml-c14n-20010315" ) ),
+                                            ),
+                                        ),
+                                        "DigestMethod": (
+                                            "^attributes^": ( "Algorithm": "http://www.w3.org/2000/09/xmldsig#sha1" ),
+                                        ),
+                                        "DigestValue": NOTHING,
+                                    ),
+                                ),
+                                "SignatureValue": NOTHING,
+                                "KeyInfo": (
+                                    "X509Data": NOTHING,
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+                "e:Body": body,
+            },
+        );
+
+        return m_options.format ? make_xml(h, XGF_ADD_FORMATTING): make_xml(h);
+    }
+
+    private usageIntern() {
+        TestReporter::usageIntern(OptionColumn);
+        printOption("-f,--format", "format XML output seen with --m_options.verbose", OptionColumn);
+        printOption("-i,--iters=ARG", "runs ARG iterations of the tests in each thread", OptionColumn);
+        printOption("-t,--threads=ARG", "runs tests in ARG threads", OptionColumn);
+    }
+}
