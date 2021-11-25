@@ -26,6 +26,7 @@
 
 #include "QC_XmlSecKeyManager.h"
 #include "QC_XmlSecKey.h"
+#include "QC_XmlSec.h"
 
 //! The \c XmlSecKeyManager class implements an xmlsec key manager (wrapper for a C++ \c xmlSecKeysManager structure)
 /**
@@ -79,4 +80,39 @@ XmlSecKeyManager::addKey(XmlSecKey[QoreXmlSecKey] key) {
         assert(*xsink);
         return QoreValue();
     }
+}
+
+//! adds certificate to the \c XmlSecKeyManager object and marks it as trusted
+/** @par Example:
+    @code{.py}
+mgr.loadCertFromPath(path, );
+    @endcode
+
+    @param key the key to add
+    @param format the format of the file data (for possible values, see @ref xmlsec_keydataformat_constants for
+    possible values)
+    @param type the certificate type; see @ref xmlsec_keydatatype_constants for possible values
+
+    @throw XMLSECKEYMANAGER-ERROR error reported by libxmlsec loading the certificate or assigning the certificate to
+    the key manager
+*/
+XmlSecKeyManager::loadCertFromPath(string path, int format, int type) {
+    mgr->loadCertFromPath(xsink, path->c_str(), (xmlSecKeyDataFormat)format, (xmlSecKeyDataType)type);
+}
+
+//! Verifies the signature of the signed XML string passed
+/** @par Example:
+    @code{.py}
+mgr.verify(signed_string);
+    @endcode
+
+    @param signed_string the signed XML string to verify
+
+    If any errors occur, an exception is thrown
+
+    @throw XMLSEC-SIGN-ERROR: error in arguments to the methods; signature verification failed
+    @throw XMLSEC-DSIGCTX-ERROR: signature verification could not be processed by libxmlse
+*/
+nothing XmlSecKeyManager::verify(string signed_string, ...) {
+    q_xmlsec_verify(xsink, signed_string, mgr, 1, args);
 }

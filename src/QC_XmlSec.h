@@ -3,7 +3,7 @@
 
     Qore Programming Language
 
-    Copyright 2003 - 2018 Qore Technologies, s.r.o.
+    Copyright 2003 - 2021 Qore Technologies, s.r.o.
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,14 @@
 #ifndef _QORE_XMLSEC_H
 
 #define _QORE_XMLSEC_H
+
+#include "QC_XmlSecKey.h"
+#include "QC_XmlSecKeyManager.h"
+
+DLLLOCAL int q_xmlsec_verify(ExceptionSink* xsink, const QoreStringNode* signed_string, QoreXmlSecKeyManager* mgr,
+        unsigned offset = 0, const QoreListNode* args = nullptr);
+DLLLOCAL int q_xmlsec_verify(ExceptionSink* xsink, const QoreStringNode* signed_string, QoreXmlSecKey* key,
+        unsigned offset = 0, const QoreListNode* args = nullptr);
 
 DLLLOCAL extern qore_classid_t CID_XMLSEC;
 DLLLOCAL extern QoreClass* QC_XMLSEC;

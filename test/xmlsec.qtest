@@ -111,7 +111,7 @@ class XmlSecTest inherits Test {
 
         for (int i = 0; i < m_options.iters; ++i) {
             assertEq(256, session_key.getSize());
-            string template = get_signature_template("1.0", "hello there, testing");
+            string template = getSignatureTemplate("1.0", "hello there, testing");
 
             # sign the string with the certificate's private key
             str = XmlSec::sign(template, cert_key);
@@ -171,7 +171,7 @@ class XmlSecTest inherits Test {
     }
 
     # returns the signature template XML string created from some example parameters
-    string get_signature_template(ver, body) {
+    string getSignatureTemplate(ver, body) {
         # this template uses several transformations including an XPath specification
         # to sign the e:Body and e:SenderDetails parts of the tree
         hash<auto> h = (

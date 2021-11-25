@@ -25,6 +25,7 @@
 #include <qore/QoreSSLCertificate.h>
 
 #include "QC_XmlSecKey.h"
+#include "QC_XmlSec.h"
 
 //! The \c XmlSecKey class implements an \c xmlsec key (wrapper for an \c xmlSecKey C++ structure
 /**
@@ -38,8 +39,8 @@ XmlSec key(key_pem, xmlSecKeyDataFormatPem, password);
     @endcode
 
     @param key the key in PEM or DER format
-    @param the format of the key (for possible values, see @ref xmlsec_keydataformat_constants for possible values)
-    @param the optional password for the key
+    @param format the format of the key (for possible values, see @ref xmlsec_keydataformat_constants for possible values)
+    @param password the optional password for the key
 
     Creates a new key based on key data (for example, in PEM or DER format), the second argument will normally be xmlSecKeyDataFormatPem or xmlSecKeyDataFormatDer.
 
@@ -83,7 +84,7 @@ XmlSecKey::constructor(string str, int num_bits, int type) {
 XmlSec key(int id, num_bits, type);
     @endcode
 
-    @param id in inteeger constant giving the key ID; see @ref xmlsec_keydataid_constants for possible values
+    @param id an integer constant giving the key ID; see @ref xmlsec_keydataid_constants for possible values
     @param num_bits the number of bits
     @param type the key type; see @ref xmlsec_keydatatype_constants for possible values
 
@@ -127,7 +128,7 @@ key.setCertificate(cert_pem, xmlSecKeyDataFormatCertPem);
     @endcode
 
     @param cert the certificate in PEM or DER format
-    @param the format of the key (for possible values, see @ref xmlsec_keydataformat_constants for possible values)
+    @param format the format of the key (for possible values, see @ref xmlsec_keydataformat_constants for possible values)
 */
 nothing XmlSecKey::setCertificate(data cert, int format) {
     const char* ptr;
@@ -202,4 +203,21 @@ int size = key.getSize());
 */
 int XmlSecKey::getSize() [flags=RET_VALUE_ONLY] {
     return key->getSize(xsink);
+}
+
+//! Verifies the signature of the signed XML string passed
+/** @par Example:
+    @code{.py}
+key.verify(signed_string);
+    @endcode
+
+    @param signed_string the signed XML string to verify
+
+    If any errors occur, an exception is thrown
+
+    @throw XMLSEC-SIGN-ERROR: error in arguments to the methods; signature verification failed
+    @throw XMLSEC-DSIGCTX-ERROR: signature verification could not be processed by libxmlse
+*/
+nothing XmlSecKey::verify(string signed_string, ...) {
+    q_xmlsec_verify(xsink, signed_string, key, 1, args);
 }

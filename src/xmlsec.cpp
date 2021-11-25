@@ -56,7 +56,7 @@ static key_data_map_t key_data_map = {
     {XMLSEC_KEYDATA_RAWX509CERTID, xmlSecKeyDataRawX509CertId},
 };
 
-QoreNamespace XmlSec_NS("XmlSec");
+QoreNamespace XmlSec_NS("Qore::XmlSec");
 qore_type_t NT_XMLSECKEYDATAID = -1;
 qore_type_t NT_XMLSECKEYDATAFORMAT = -1;
 
@@ -74,13 +74,13 @@ xmlSecKeyDataId xmlsec_get_keydata_id(int id) {
 
 // xmlsec library error callback function
 static void qore_xmlSecErrorsCallback(const char *file, int line, const char *func, const char *errorObject, const char *errorSubject, int reason, const char *msg) {
-   //printd(5, "xmlsec error: %s: %s: %s\n", errorObject, errorSubject, msg);
+    printd(0, "xmlsec error: %s: %s: %s\n", errorObject, errorSubject, msg);
 }
 
 DLLLOCAL void preinitXmlSecKeyClass();
 DLLLOCAL void preinitXmlSecKeyManagerClass();
 
-QoreStringNode *xmlsec_module_init() {
+QoreStringNode* xmlsec_module_init() {
     xmlLoadExtDtdDefaultValue = XML_DETECT_IDS | XML_COMPLETE_ATTRS;
     xmlSubstituteEntitiesDefault(1);
 #ifndef XMLSEC_NO_XSLT
@@ -118,12 +118,14 @@ QoreStringNode *xmlsec_module_init() {
 #endif // XMLSEC_CRYPTO_DYNAMIC_LOADING
 
     // Init crypto library
-    if (xmlSecCryptoAppInit(NULL) < 0)
+    if (xmlSecCryptoAppInit(NULL) < 0) {
         return new QoreStringNode("crypto initialization failed");
+    }
 
     // Init xmlsec-crypto library
-    if (xmlSecCryptoInit() < 0)
+    if (xmlSecCryptoInit() < 0) {
         return new QoreStringNode("xmlsec-crypto initialization failed");
+    }
 
     // set error callback function
     xmlSecErrorsSetCallback(qore_xmlSecErrorsCallback);
@@ -136,10 +138,10 @@ QoreStringNode *xmlsec_module_init() {
     XmlSec_NS.addSystemClass(initXmlSecKeyClass(XmlSec_NS));
     XmlSec_NS.addSystemClass(initXmlSecKeyManagerClass(XmlSec_NS));
 
-    return 0;
+    return nullptr;
 }
 
-void xmlsec_module_ns_init(QoreNamespace *rns, QoreNamespace *qns) {
+void xmlsec_module_ns_init(QoreNamespace* rns, QoreNamespace* qns) {
     qns->addNamespace(XmlSec_NS.copy());
 }
 

@@ -66,11 +66,26 @@ public:
         return 0;
     }
 
+    //! loads a certificate from a file and marks it as a trusted certificate
+    DLLLOCAL int loadCertFromPath(ExceptionSink* xsink, const char* filename, xmlSecKeyDataFormat format,
+            xmlSecKeyDataType type) {
+        AutoLocker al(this);
+
+        if (xmlSecCryptoAppKeysMngrCertLoad(keyMgr, filename, format, type)) {
+            xsink->raiseException("XMLSECKEYMANAGER-ERROR", "failed to import certificate from path '%s'", filename);
+            return -1;
+        }
+
+        return 0;
+    }
+
     DLLLOCAL operator bool() const {
         return (bool)keyMgr;
     }
 
-    DLLLOCAL xmlSecKeysMngrPtr getKeyManager() { return keyMgr; }
+    DLLLOCAL xmlSecKeysMngrPtr getKeyManager() {
+        return keyMgr;
+    }
 };
 
 #endif

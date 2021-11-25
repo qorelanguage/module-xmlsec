@@ -1,7 +1,7 @@
 /*
     Qore Programming Language
 
-    Copyright 2003 - 2018 Qore Technologies, s.r.o.
+    Copyright 2003 - 2021 Qore Technologies, s.r.o.
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -23,17 +23,19 @@
 #define _QORE_XMLSEC_DSIGCTX_H
 
 class DSigCtx {
-private:
-
 public:
     xmlSecDSigCtxPtr dsigCtx;
 
-    DLLLOCAL DSigCtx() : dsigCtx(xmlSecDSigCtxCreate(0)) {
+    DLLLOCAL DSigCtx() : dsigCtx(xmlSecDSigCtxCreate(nullptr)) {
+    }
+
+    DLLLOCAL DSigCtx(xmlSecKeysMngrPtr mgr) : dsigCtx(xmlSecDSigCtxCreate(mgr)) {
     }
 
     DLLLOCAL ~DSigCtx() {
-        if (dsigCtx)
+        if (dsigCtx) {
             xmlSecDSigCtxDestroy(dsigCtx);
+        }
     }
 
     // takes over ownership of key
@@ -41,8 +43,7 @@ public:
         dsigCtx->signKey = key;
     }
 
-    DLLLOCAL int sign(xmlNodePtr node, ExceptionSink *xsink)
-    {
+    DLLLOCAL int sign(xmlNodePtr node, ExceptionSink* xsink) {
 #ifdef NEED_XMLSEC_BIG_LOCK
         AutoLocker al(big_lock);
 #endif
@@ -54,11 +55,18 @@ public:
         return 0;
     }
 
-    DLLLOCAL int verify(xmlNodePtr node, ExceptionSink *xsink) {
+    DLLLOCAL int verify(xmlNodePtr node, ExceptionSink* xsink) {
         if (xmlSecDSigCtxVerify(dsigCtx, node) < 0) {
             xsink->raiseException("XMLSEC-DSIGCTX-ERROR", "signature could not be verified");
             return -1;
         }
+
+        if ((dsigCtx->status == xmlSecDSigStatusSucceeded) &&
+            (xmlSecPtrListGetSize(&(dsigCtx->signedInfoReferences)) != 1)) {
+            xsink->raiseException("XMLSEC-DSIGCTX-ERROR", "multiple references found");
+            return -1;
+        }
+
         return 0;
     }
 
@@ -66,7 +74,9 @@ public:
         return (bool)dsigCtx;
     }
 
-    DLLLOCAL xmlSecDSigStatus getStatus() { return dsigCtx->status; }
+    DLLLOCAL xmlSecDSigStatus getStatus() {
+        return dsigCtx->status;
+    }
 
     DLLLOCAL xmlSecTransformStatus getTransformStatus() {
         assert(dsigCtx->signMethod);
