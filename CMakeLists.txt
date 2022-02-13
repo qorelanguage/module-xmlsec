@@ -75,7 +75,7 @@ set(QORE_DOX_TMPL_SRC
 
 add_library(${module_name} MODULE ${QPP_SOURCES} ${CPP_SRC})
 
-qore_binary_module(${module_name} ${PROJECT_VERSION} "${XMLSEC1_LIBRARIES}" "${XMLSEC1_OPENSSL_LIBRARIES}")
+qore_external_binary_module(${module_name} ${PROJECT_VERSION} "${XMLSEC1_LIBRARIES}" "${XMLSEC1_OPENSSL_LIBRARIES}")
 #qore_user_modules("${QMOD}")
 install(PROGRAMS ${SCRIPTS} DESTINATION bin)
 
@@ -87,5 +87,5 @@ FIND_PACKAGE(Doxygen)
 if (DOXYGEN_FOUND)
     qore_wrap_dox(QORE_DOX_SRC ${QORE_DOX_TMPL_SRC})
     add_custom_target(QORE_MOD_DOX_FILES DEPENDS ${QORE_DOX_SRC})
-    add_dependencies(docs QORE_MOD_DOX_FILES)
+    add_dependencies(docs-module QORE_MOD_DOX_FILES)
 endif()
