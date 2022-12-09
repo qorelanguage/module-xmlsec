@@ -242,16 +242,16 @@ int q_xmlsec_verify(ExceptionSink* xsink, const QoreStringNode* signed_string, Q
 /** @defgroup xmlsec_constants xmlsec Module Constants
     xmlsec module constants
 */
-//@{
+///@{
 namespace Qore::XmlSec;
 //! the version of this module
 const ModuleVersion = qore(new QoreStringNode(PACKAGE_VERSION));
-//@}
+///@}
 
 /** @defgroup xmlsec_keydataid_constants xmlsec Key Data ID Constants
     Key data ID constants
 */
-//@{
+///@{
 namespace Qore::XmlSec;
 //! AES
 const xmlSecKeyDataAesId = XMLSEC_KEYDATA_AESID;
@@ -267,12 +267,12 @@ const xmlSecKeyDataRsaId = XMLSEC_KEYDATA_RSAID;
 const xmlSecKeyDataX509Id = XMLSEC_KEYDATA_X509ID;
 //! Raw X.509 certificate
 const xmlSecKeyDataRawX509CertId = XMLSEC_KEYDATA_RAWX509CERTID;
-//@}
+///@}
 
 /** @defgroup xmlsec_keydataformat_constants xmlsec Key Format Constants
     Key data format constants
 */
-//@{
+///@{
 namespace Qore::XmlSec;
 //! unknown
 const xmlSecKeyDataFormatUnknown = qore(xmlSecKeyDataFormatUnknown);
@@ -292,12 +292,12 @@ const xmlSecKeyDataFormatPkcs12 = qore(xmlSecKeyDataFormatPkcs12);
 const xmlSecKeyDataFormatCertPem = qore(xmlSecKeyDataFormatCertPem);
 //! Certificate DER
 const xmlSecKeyDataFormatCertDer = qore(xmlSecKeyDataFormatCertDer);
-//@
+///@
 
 /** @defgroup xmlsec_keydatatype_constants xmlsec Key Type Constants
     Key data type constants
 */
-//@{
+///@{
 //! unknown
 const xmlSecKeyDataTypeUnknown = qore(xmlSecKeyDataTypeUnknown);
 //! none
@@ -316,7 +316,7 @@ const xmlSecKeyDataTypePermanent = qore(xmlSecKeyDataTypePermanent);
 const xmlSecKeyDataTypeTrusted = qore(xmlSecKeyDataTypeTrusted);
 //! any
 const xmlSecKeyDataTypeAny = qore(xmlSecKeyDataTypeAny);
-//@}
+///@}
 
 //! The \c XmlSec class implements static methods for working with XmlSec keys
 /**
