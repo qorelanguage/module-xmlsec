@@ -292,12 +292,13 @@ const xmlSecKeyDataFormatPkcs12 = qore(xmlSecKeyDataFormatPkcs12);
 const xmlSecKeyDataFormatCertPem = qore(xmlSecKeyDataFormatCertPem);
 //! Certificate DER
 const xmlSecKeyDataFormatCertDer = qore(xmlSecKeyDataFormatCertDer);
-///@
+///@}
 
 /** @defgroup xmlsec_keydatatype_constants xmlsec Key Type Constants
     Key data type constants
 */
 ///@{
+namespace Qore::XmlSec;
 //! unknown
 const xmlSecKeyDataTypeUnknown = qore(xmlSecKeyDataTypeUnknown);
 //! none
